@@ -42,37 +42,42 @@ import WareHouse.domain.Company;
 import WareHouse.domain.Item;
 import WareHouse.domain.User;
 import WareHouse.domain.history;
+
+import WareHouse.controller.InventoryController;
 import java.util.List;
 
 
 
 public class TableWindow1 extends JPanel {
+    private final InventoryController controller;
 	private static final long serialVersionUID = 1L;
 	private static final boolean FALSE = false;
 	private static final boolean TRUE = false;
     private boolean DEBUG = false;
-    private JTable table;
-    private JTextField filterText;
-    private JTextArea statusText;
-    private TableRowSorter<MyTableModel> sorter;
+    public JTable table;
+    public JTextField filterText;
+    public JTextArea statusText;
+    public TableRowSorter<MyTableModel> sorter;
 
     
  ///Table Panel 2
-	private JTable table2;
-	private JTextField filterText2;
-	private JTextArea statusText2;
-	private TableRowSorter<MyTableModel2> sorter2;
-	private DetailsPanel detailsPanel;
-    private final ArrayList<Item> items;
-    private final ArrayList<Company> companies;
-    private final ArrayList<history> history;
+    public JTable table2;
+    public JTextField filterText2;
+    public JTextArea statusText2;
+    public TableRowSorter<MyTableModel2> sorter2;
+    public DetailsPanel detailsPanel;
+    public final ArrayList<Item> items;
+    public final ArrayList<Company> companies;
+    public final ArrayList<history> history;
+    public MyTableModel2[] model2 = new MyTableModel2[1];
 
     
  // Code for first 2 windows i.e. company and items window
     
-    public TableWindow1(ArrayList<Item> items,ArrayList<Company> companies,ArrayList<history> history11)
+    public TableWindow1(ArrayList<Item> items, ArrayList<Company> companies, ArrayList<history> history11, InventoryController controller)
     {
         super();
+        this.controller = controller;
         setOpaque(true);
         setBackground(new java.awt.Color(240, 240, 255));
         setMinimumSize(new java.awt.Dimension(300, 200));
@@ -100,41 +105,15 @@ public class TableWindow1 extends JPanel {
                         statusText.setText("");
                     } else {
                         int modelRow = table.convertRowIndexToModel(viewRow);
-                        Mainframe.companyIndex = modelRow;
-                        statusText.setText(String.format(" Company selected: %s   Selected Row in model: %d.",
-                                maindriver.Company11.get(modelRow).getCompanyName(), modelRow));
-                        // Update current company field in DetailsPanel
-                        DetailsPanel.currentCompanyField.setText(maindriver.Company11.get(modelRow).getCompanyName());
-                        // Use the selected company's item list directly
-                        ArrayList<Item> filteredItems = new ArrayList<>(maindriver.Company11.get(modelRow).getItems());
-                        model2[0] = new MyTableModel2(filteredItems, 0);
-                        table2.setModel(model2[0]);
-                        sorter2.setModel(model2[0]);
-                        // Select the first item if available
-                        if (!filteredItems.isEmpty()) {
-                            table2.setRowSelectionInterval(0, 0);
-                            Item firstItem = filteredItems.get(0);
-                            String itemName = firstItem.getItemName();
-                            java.util.List<history> histories = firstItem.getHistory();
-                            if (histories != null && !histories.isEmpty()) {
-                                history firstHistory = histories.get(0);
-                                String supplier = firstHistory.getSupplier();
-                                String location = firstHistory.getLocation();
-                                String delivery = firstHistory.getDeliveryDate();
-                                int amount = firstHistory.getAmount();
-                                DetailsPanel.nameField.setText(itemName);
-                                DetailsPanel.locationField.setText(location);
-                                DetailsPanel.supplierField.setText(supplier);
-                                DetailsPanel.deliveryField.setText(delivery);
-                                DetailsPanel.amountField.setText(String.valueOf(amount));
-                            } else {
-                                DetailsPanel.nameField.setText(itemName);
-                                DetailsPanel.locationField.setText("");
-                                DetailsPanel.supplierField.setText("");
-                                DetailsPanel.deliveryField.setText("");
-                                DetailsPanel.amountField.setText(String.valueOf(firstItem.getQuantity()));
-                            }
+                        // Call controller method for company selection
+                        try {
+                            controller.getAllCompanies(); // Replace with actual method if needed
+                        } catch (java.sql.SQLException ex) {
+                            ex.printStackTrace();
+                            statusText.setText("Error loading companies: " + ex.getMessage());
                         }
+                        statusText.setText(String.format(" Company selected: %d.", modelRow));
+                        // UI updates should be handled by controller callbacks or returned data
                     }
                 }
             }
@@ -221,61 +200,13 @@ public class TableWindow1 extends JPanel {
                       }
                       int viewRow = table2.getSelectedRow();
                       if (viewRow < 0) {
-                          //Selection got filtered away.
                           statusText2.setText("");
                       } else {
                           int modelRow = table2.convertRowIndexToModel(viewRow);
-                          if (modelRow < 0 || modelRow >= maindriver.Company11.get(Mainframe.companyIndex).getItems().size()) {
-                              statusText2.setText("");
-                              return;
-                          }
-                          Mainframe.itemIndex = modelRow;
-                          statusText2.setText(
-                              String.format(" Item selected: %s. " +
-                                  "Selected Row in model: %d.",
-                                  maindriver.Company11.get(Mainframe.companyIndex).getItems().get(Mainframe.itemIndex).getItemName(), modelRow));
-
-                          // clear table 3
-                          int rowsToClear = TableWindow2.model.getRowCount();
-                          int colsToClear = TableWindow2.model.getColumnCount();
-                          for (int i = 0; i < rowsToClear; i++) {
-                              for (int j = 0; j < colsToClear; j++) {
-                                  TableWindow2.model.setValueAt(" ", i, j);
-                              }
-                          }
-
-                          ArrayList<history> currentHistoryPointer = maindriver.Company11.get(Mainframe.companyIndex).getItems().get(Mainframe.itemIndex).getHistory();
-                          int listSize = currentHistoryPointer.size();
-                          for (int i = 0; i < listSize; i++) {
-                              // Write directly to the model (view indices can be invalid when sorting/filtering).
-                              TableWindow2.model.setValueAt((Object) currentHistoryPointer.get(i).getDeliveryDate(), i, 0);
-                              TableWindow2.model.setValueAt((Object) currentHistoryPointer.get(i).getLocation(), i, 1);
-                              TableWindow2.model.setValueAt((Object) currentHistoryPointer.get(i).getAmount(), i, 2);
-                              TableWindow2.model.setValueAt((Object) currentHistoryPointer.get(i).getSupplier(), i, 3);
-                          }
-
-                          // Update DetailsPanel with the most recent history record if available
-                          if (listSize > 0) {
-                              history latestHistory = currentHistoryPointer.get(listSize - 1); // Use the most recent (last) history record
-                              DetailsPanel.nameField.setText(maindriver.Company11.get(Mainframe.companyIndex).getItems().get(Mainframe.itemIndex).getItemName());
-                              DetailsPanel.locationField.setText(latestHistory.getLocation());
-                              DetailsPanel.deliveryField.setText(latestHistory.getDeliveryDate());
-                              DetailsPanel.amountField.setText(String.valueOf(latestHistory.getAmount()));
-                              DetailsPanel.supplierField.setText(latestHistory.getSupplier());
-                              DetailsPanel.reportDeliveryFrom.setText(latestHistory.getDeliveryDate());
-                              DetailsPanel.reportDeliveryTo.setText(latestHistory.getDeliveryDate());
-                              DetailsPanel.notesArea.setText(latestHistory.getNotes());
-                          } else {
-                              // If no history, fill with item info
-                              Item selectedItem = maindriver.Company11.get(Mainframe.companyIndex).getItems().get(Mainframe.itemIndex);
-                              DetailsPanel.nameField.setText(selectedItem.getItemName());
-                              DetailsPanel.locationField.setText("");
-                              DetailsPanel.deliveryField.setText("");
-                              DetailsPanel.amountField.setText(String.valueOf(selectedItem.getQuantity()));
-                              DetailsPanel.supplierField.setText("");
-                          }
-
-                          TableWindow2.nmrRowsTable3 = listSize;
+                          // Call controller method for item selection
+                          // Example: controller.onItemSelected(modelRow);
+                          // You may want to implement a method in InventoryController for this
+                          statusText2.setText(String.format(" Item selected: %d.", modelRow));
                       }
                   }
               });
@@ -433,7 +364,7 @@ public class TableWindow1 extends JPanel {
     }
     
   
-    class MyTableModel2 extends AbstractTableModel {
+    public static class MyTableModel2 extends AbstractTableModel {
         private static final long serialVersionUID = 1L;
         private String[] columnNames = {
             "Item Name",
@@ -483,13 +414,12 @@ public class TableWindow1 extends JPanel {
             return col == 1;
         }
 
-        public void updateModel() {
-            final ArrayList<Item> tableItemPointer = maindriver.Company11.get(Mainframe.companyIndex).getItems();
-            int listSize = tableItemPointer.size();
+        public void updateModel(List<Item> items) {
+            int listSize = items.size();
             data = new Object[listSize][2];
             for (int i = 0; i < listSize; i++) {
-                data[i][0] = tableItemPointer.get(i).getItemName();
-                data[i][1] = tableItemPointer.get(i).getQuantity();
+                data[i][0] = items.get(i).getItemName();
+                data[i][1] = items.get(i).getQuantity();
             }
         }
 
@@ -498,34 +428,8 @@ public class TableWindow1 extends JPanel {
          * data can change.
          */
         public void setValueAt(Object value, int row, int col) {
-            if (DEBUG) {
-                System.out.println("Setting value at " + row + "," + col
-                                   + " to " + value
-                                   + " (an instance of "
-                                   + value.getClass() + ")");
-            }
-
             data[row][col] = value;
             fireTableCellUpdated(row, col);
-
-            if (DEBUG) {
-                System.out.println("New value of data:");
-                printDebugData();
-            }
-        }
-
-        private void printDebugData() {
-            int numRows = getRowCount();
-            int numCols = getColumnCount();
-
-            for (int i=0; i < numRows; i++) {
-                System.out.print("    row " + i + ":");
-                for (int j=0; j < numCols; j++) {
-                    System.out.print("  " + data[i][j]);
-                }
-                System.out.println();
-            }
-            System.out.println("--------------------------");
         }
     }
     

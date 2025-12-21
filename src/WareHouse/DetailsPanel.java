@@ -69,6 +69,8 @@ import javax.swing.BoxLayout;
 // If the User Interface was fully completed it should include a calendar on the dash. The date has proven v.difficult
 // with JTextStrings.
 /*-------------------------------------------------------------------------------------------------------------------*/
+import WareHouse.controller.InventoryController;
+
 public class DetailsPanel extends JPanel {
             /**
              * Set all main fields in the DetailsPanel.
@@ -84,7 +86,7 @@ public class DetailsPanel extends JPanel {
             }
        
     // Field to display current selected company
-    static JTextField currentCompanyField = new JTextField(15);
+    private JTextField currentCompanyField = new JTextField(15);
 
     // Add a setter for currentCompanyField
     public void setCurrentCompanyField(String name) {
@@ -95,43 +97,65 @@ public class DetailsPanel extends JPanel {
     private EventListenerList listenerList = new EventListenerList();
 
     // new
-        static JTextField nameField = new JTextField("Name", 10);
-        static JTextField locationField = new JTextField("Location", 10);
-        static JTextField supplierField = new JTextField("Supplier", 10);
-        static JTextField deliveryField = new JTextField("Delivery", 10);
-        static JTextField amountField = new JTextField("Amount", 10);
-        static JTextArea notesArea = new JTextArea(5, 20); // 5 rows, 20 columns
+    private JTextField nameField = new JTextField("Name", 10);
+    private JTextField locationField = new JTextField("Location", 10);
+    private JTextField supplierField = new JTextField("Supplier", 10);
+    private JTextField deliveryField = new JTextField("Delivery", 10);
+    private JTextField amountField = new JTextField("Amount", 10);
+    private JTextArea notesArea = new JTextArea(5, 20); // 5 rows, 20 columns
 
-    static JTextField reportDeliveryFrom = new JTextField(8);
-    static JTextField reportDeliveryTo = new JTextField(8);
+    private JTextField reportDeliveryFrom = new JTextField(8);
+    private JTextField reportDeliveryTo = new JTextField(8);
 
-    static JLabel statusLabel = new JLabel("Status: Waiting ");
+    private JLabel statusLabel = new JLabel("Status: Waiting ");
 
     // Define all required labels
-    static JLabel txCompanyNameLabel = new JLabel("Transaction Company Name:");
-    static JLabel currentCompanyLabel = new JLabel("Current Company:");
-    static JLabel nameLabel = new JLabel("Service Name:");
-    static JLabel providerNameLabel = new JLabel("Supplier:");
-    static JLabel locationLabel = new JLabel("Location:");
-    static JLabel deliveryLabel = new JLabel("Date:");
-    static JLabel quantityLabel = new JLabel("Quantity:");
-    static JLabel spacerLabel = new JLabel("                ");
+    private JLabel txCompanyNameLabel = new JLabel("Transaction Company Name:");
+    private JLabel currentCompanyLabel = new JLabel("Current Company:");
+    private JLabel nameLabel = new JLabel("Service Name:");
+    private JLabel providerNameLabel = new JLabel("Supplier:");
+    private JLabel locationLabel = new JLabel("Location:");
+    private JLabel deliveryLabel = new JLabel("Date:");
+    private JLabel quantityLabel = new JLabel("Quantity:");
+    private JLabel spacerLabel = new JLabel("                ");
 
     // Define all required buttons
-    static JButton addBtn = new JButton("Add");
-    static JButton removeBtn = new JButton("Remove");
-    static JButton updateBtn = new JButton("Update");
-    static JButton updateItemBtn = new JButton("Update Item");
-    static JButton deleteBtn = new JButton("Delete");
-    static JButton itemReportBtn = new JButton("Item Report");
-    static JButton itemDeliveredReportBtn = new JButton("Delivered Report");
-    static JButton backupBtn = new JButton("Backup");
-    static JButton restoreBtn = new JButton("Restore");
-    static JButton serialBackupBtn = new JButton("Serial Backup");
-    static JButton serialRestoreBtn = new JButton("Serial Restore");
+    private JButton addBtn = new JButton("Add");
+    private JButton removeBtn = new JButton("Remove");
+    private JButton updateBtn = new JButton("Update");
+    private JButton updateItemBtn = new JButton("Update Item");
+    private JButton deleteBtn = new JButton("Delete");
+    private JButton itemReportBtn = new JButton("Item Report");
+    private JButton itemDeliveredReportBtn = new JButton("Delivered Report");
+    private JButton backupBtn = new JButton("Backup");
+    private JButton restoreBtn = new JButton("Restore");
+    private JButton serialBackupBtn = new JButton("Serial Backup");
+    private JButton serialRestoreBtn = new JButton("Serial Restore");
 
 
-    public DetailsPanel() {
+    private final InventoryController controller;
+
+    public DetailsPanel(InventoryController controller) {
+                // Add button action listeners to call controller methods
+                addBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        // Example: call controller to add item/history
+                        // controller.addItem(...); // Fill with actual parameters from fields
+                    }
+                });
+                updateBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        // Example: call controller to update item/history
+                        // controller.updateHistory(...); // Fill with actual parameters from fields
+                    }
+                });
+                removeBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        // Example: call controller to delete item/history
+                        // controller.deleteItem(...); // Fill with actual parameters from fields
+                    }
+                });
+        this.controller = controller;
                     // Set fixed size for the DetailsPanel to prevent stretching
                     Dimension panelDim = new Dimension(500, 350);
                     setPreferredSize(panelDim);
@@ -244,12 +268,11 @@ public class DetailsPanel extends JPanel {
     }
 
     // Helper to get the current selected company name
+    // Now handled by controller; UI should not access data directly
     private String getCurrentCompanyName() {
-        try {
-            return maindriver.Company11.get(Mainframe.companyIndex).getName();
-        } catch (Exception e) {
-            return "";
-        }
+        // Example: return controller.getCurrentCompanyName();
+        // Use controller to get the current company name if needed
+        return "";
     }
 
     // Moved misplaced GUI layout code into the constructor

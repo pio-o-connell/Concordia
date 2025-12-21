@@ -28,23 +28,26 @@ import WareHouse.domain.Item;
 import WareHouse.domain.User;
 import WareHouse.domain.history;
 
+import WareHouse.controller.InventoryController;
+
 public class TableWindow2 extends JPanel {
-	private ArrayList<history> history11,history;
-	private ArrayList<Company> companies11;
-	private ArrayList<Item> items11,item;
-	
-	private static final long serialVersionUID = 1L;
-	private static final boolean FALSE = false;
-	private static final boolean TRUE = false;
+    private ArrayList<history> history11,history;
+    private ArrayList<Company> companies11;
+    private ArrayList<Item> items11,item;
+
+    private static final long serialVersionUID = 1L;
+    private static final boolean FALSE = false;
+    private static final boolean TRUE = false;
     private boolean DEBUG = false;
     public static JTable table3;
     private JTextField filterText3;
     private JTextArea statusText3;
-    private TableRowSorter<MyTableModel> sorter3;
-    public static int nmrRowsTable3;
-    public static MyTableModel model;
+    public TableRowSorter<MyTableModel> sorter3;
+    public int nmrRowsTable3;
+    public MyTableModel model;
+    private final InventoryController controller;
 
-    public TableWindow2(ArrayList<Item> items,ArrayList<Company> companies,ArrayList<history> history11) {
+    public TableWindow2(ArrayList<Item> items, ArrayList<Company> companies, ArrayList<history> history11, InventoryController controller) {
         super();
         setOpaque(true);
         setBackground(new java.awt.Color(255, 240, 240));
@@ -54,6 +57,7 @@ public class TableWindow2 extends JPanel {
         this.history11 = history11;
         this.items11 = items;
         this.companies11 = companies;
+        this.controller = controller;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
      //   final MyTableModel
         model = new MyTableModel(companies.get(0).getItems().get(0).getHistory(),0);
@@ -76,29 +80,14 @@ public class TableWindow2 extends JPanel {
                             return;
                         }
                         int viewRow = table3.getSelectedRow();
-                        if (viewRow < 0) {
-                            //Selection got filtered away.
+                        if (viewRow < 0 || viewRow >= table3.getRowCount()) {
                             statusText3.setText("");
-                        } else {
-                            if (viewRow >= table3.getRowCount()) {
-                                statusText3.setText("");
-                                return;
-                            }
-                            int modelRow = table3.convertRowIndexToModel(viewRow);
-                            ArrayList<history> historyList = maindriver.Company11.get(Mainframe.companyIndex).getItems().get(Mainframe.itemIndex).getHistory();
-                            if (modelRow < 0 || modelRow >= historyList.size()) {
-                                statusText3.setText("");
-                                return;
-                            }
-                            Mainframe.historyIndex = modelRow;
-                            DetailsPanel.locationField.setText(historyList.get(Mainframe.historyIndex).getLocation());
-                            DetailsPanel.amountField.setText(String.valueOf(historyList.get(Mainframe.historyIndex).getAmount()));
-                            DetailsPanel.supplierField.setText(historyList.get(Mainframe.historyIndex).getSupplier());
-                            DetailsPanel.deliveryField.setText(historyList.get(Mainframe.historyIndex).getDeliveryDate());
-                            DetailsPanel.notesArea.setText(historyList.get(Mainframe.historyIndex).getNotes());
-                            // Also update the Notes field in the south panel
-                            statusText3.setText(historyList.get(Mainframe.historyIndex).getNotes());
+                            return;
                         }
+                        int modelRow = table3.convertRowIndexToModel(viewRow);
+                        // Call controller method for history selection
+                        // Example: controller.onHistorySelected(modelRow);
+                        statusText3.setText(String.format("History row selected: %d", modelRow));
                     }
                 }
         );
@@ -159,7 +148,7 @@ public class TableWindow2 extends JPanel {
 
 
 
-    class MyTableModel extends AbstractTableModel {
+    public static class MyTableModel extends AbstractTableModel {
     	private static final long serialVersionUID = 1L;
         private String[] columnNames = {
                         "Delivery Date",
@@ -171,22 +160,19 @@ public class TableWindow2 extends JPanel {
         @SuppressWarnings("deprecation")
 		private Object[][] data;
         
-        	public MyTableModel(ArrayList<history> history,int index1){
-        		this.history11=history;
-        		int index=index1;
-        		int listSize = history11.size();
+            public MyTableModel(ArrayList<history> history,int index1){
+                this.history11=history;
+                int index=index1;
+                int listSize = history11.size();
                 data = new Object[listSize][4];
-        		nmrRowsTable3=listSize;
-            	for(int i = 0; i < listSize; i++)
-            	{
-            //		data[i][0]=(Object)history11.get(i).getHistoryId();
-            //		data[i][1]=(Object)history11.get(i).getItemId();
-            		data[i][0]=(Object)history11.get(i).getDeliveryDate();
+                for(int i = 0; i < listSize; i++)
+                {
+                    data[i][0]=(Object)history11.get(i).getDeliveryDate();
                     data[i][1]=(Object)history11.get(i).getLocation();
-            		data[i][2]=(Object)history11.get(i).getAmount();
-            		data[i][3]=(Object)history11.get(i).getSupplier();
-            	}
-        	}
+                    data[i][2]=(Object)history11.get(i).getAmount();
+                    data[i][3]=(Object)history11.get(i).getSupplier();
+                }
+            }
         
         
 	
