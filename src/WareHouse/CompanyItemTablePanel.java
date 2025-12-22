@@ -3,8 +3,8 @@ package WareHouse;
 
 //	import Mainframe;
 /*------------------------------------------------------------------------------------------------------------------*/
-// TableWindow1 Class retrieves the data structure and renders both the Companies and Items tables.
-// TableWindow1 also has 2 anonymous class containing  action listeners,called for when user selects an table item
+// CompanyItemTablePanel Class retrieves the data structure and renders both the Companies and Items tables.
+// CompanyItemTablePanel also has 2 anonymous class containing  action listeners,called for when user selects an table item
 // from Company or Item tables respectively.
 // Selecting a row in the Company table has the effect of updating the Items Window. 
 // Selecting a row in the Items table has the effect of updating the History table (class located in Table Window 2).
@@ -48,7 +48,7 @@ import java.util.List;
 
 
 
-public class TableWindow1 extends JPanel {
+public class CompanyItemTablePanel extends JPanel {
     private final InventoryController controller;
 	private static final long serialVersionUID = 1L;
 	private static final boolean FALSE = false;
@@ -65,7 +65,7 @@ public class TableWindow1 extends JPanel {
     public JTextField filterText2;
     public JTextArea statusText2;
     public TableRowSorter<MyTableModel2> sorter2;
-    public DetailsPanel detailsPanel;
+    public AdminPanel detailsPanel;
     public final ArrayList<Item> items;
     public final ArrayList<Company> companies;
     public final ArrayList<history> history;
@@ -74,7 +74,7 @@ public class TableWindow1 extends JPanel {
     
  // Code for first 2 windows i.e. company and items window
     
-    public TableWindow1(ArrayList<Item> items, ArrayList<Company> companies, ArrayList<history> history11, InventoryController controller)
+    public CompanyItemTablePanel(ArrayList<Item> items, ArrayList<Company> companies, ArrayList<history> history11, InventoryController controller)
     {
         super();
         this.controller = controller;

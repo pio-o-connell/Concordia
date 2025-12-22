@@ -16,7 +16,7 @@ import WareHouse.domain.Item;
 import WareHouse.domain.User;
 import WareHouse.domain.history;
 import WareHouse.Mainframe;
-import WareHouse.DetailsPanel;
+import WareHouse.AdminPanel;
 
 public final class Databases {
     // Resets and repopulates the database with gardening test data

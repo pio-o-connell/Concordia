@@ -52,6 +52,9 @@
     - [Infrastructure / Wiring](#infrastructure--wiring)
   - [Phases-seven](#phases-seven)
     - [Remove legacy shortcuts](#remove-legacy-shortcuts)
+  - [Annotations](#annotations)
+    - [Add annotations](#add-annotations)
+  
 
 ## Phases-one
 ---
@@ -124,9 +127,6 @@
 
 ## Phases-three
 ---
-
-
-
 
 ### Introduce Services (thin at first)
     
@@ -391,6 +391,46 @@ Annotations are labels, not magic:
 <br>
 
 [Back To Top](#swing---clean---layers)
+
+
+## Annotations 
+---
+
+### Add annotations
+
+<details>
+    <summary>Details
+    </summary>
+    Using annotations only as semantic markers means they carry meaning for humans (and future tools), but no runtime behaviour.
+
+    In this project:
+        @Service
+        @Repository
+        @Component
+        @Controller
+        @Transactional
+     Do nothing by themselves
+
+    They:
+    do not create objects
+    do not inject dependencies
+    do not manage transactions
+    do not change execution
+    They exist to say:
+    “This class plays this role in the architecture.”
+
+
+
+
+</details>
+<br>
+
+[Back To Top](#swing---clean---layers)
+
+
+
+
+
 
 
 

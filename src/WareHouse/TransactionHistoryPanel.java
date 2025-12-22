@@ -3,10 +3,10 @@ package WareHouse;
 
 /*------------------------------------------------------------------------------------------------------------------*/
 //TableWindow2 Class retrieves the data structure (from memory) and renders the History tables.
-//TableWindow1 also has 1 anonymous class containing  action listeners,called for when user selects an table item
+//CompanyItemTablePanel also has 1 anonymous class containing  action listeners,called for when user selects an table item
 //from History tables respectively.
 // History tables is non editable - risk of data inconsistency too high
-//Selecting a row in the History table has the effect of updating the data entry controls (located in the DetailsPanel Class). 
+//Selecting a row in the History table has the effect of updating the data entry controls (located in the AdminPanel Class).
 //
 // Most Companies purchase manufacturers items from the same suppliers usually this will ease the data entry procedure
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -30,7 +30,7 @@ import WareHouse.domain.history;
 
 import WareHouse.controller.InventoryController;
 
-public class TableWindow2 extends JPanel {
+public class TransactionHistoryPanel extends JPanel {
     private ArrayList<history> history11,history;
     private ArrayList<Company> companies11;
     private ArrayList<Item> items11,item;
@@ -47,7 +47,7 @@ public class TableWindow2 extends JPanel {
     public MyTableModel model;
     private final InventoryController controller;
 
-    public TableWindow2(ArrayList<Item> items, ArrayList<Company> companies, ArrayList<history> history11, InventoryController controller) {
+    public TransactionHistoryPanel(ArrayList<Item> items, ArrayList<Company> companies, ArrayList<history> history11, InventoryController controller) {
         super();
         setOpaque(true);
         setBackground(new java.awt.Color(255, 240, 240));

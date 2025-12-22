@@ -36,7 +36,7 @@ import javax.swing.BoxLayout;
 //import com.mysql.jdbc.Connection;
 
 /*------------------------------------------------------------------------------------------------------------------*/
-// DetailsPanel Class facilitates the entry of item purchased transaction in the WareHouse Class.
+// AdminPanel Class facilitates the entry of item purchased transaction in the WareHouse Class.
 // It's necessary to select a Supplier,then select an item from the item tables.
 // Unfortunately, there are issues setting a default selection in the windows on startup - this would guarantee the
 // system is in a steady state.It is but just not displayed.
@@ -70,7 +70,7 @@ import javax.swing.BoxLayout;
 /*-------------------------------------------------------------------------------------------------------------------*/
 import WareHouse.controller.InventoryController;
 
-public class DetailsPanel extends JPanel {
+public class AdminPanel extends JPanel {
             /**
              * Set all main fields in the DetailsPanel.
              * Call this after reading values from the database.
@@ -134,7 +134,7 @@ public class DetailsPanel extends JPanel {
 
     private final InventoryController controller;
 
-    public DetailsPanel(InventoryController controller) {
+    public AdminPanel(InventoryController controller) {
                 // Add button action listeners to call controller methods
                 addBtn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
