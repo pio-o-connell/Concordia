@@ -10,6 +10,27 @@ import WareHouse.domain.Company;
 import WareHouse.domain.history;
 
 public class ItemRepository {
+        // Retrieve all items from the database
+        public ArrayList<Item> getAllItems() throws SQLException {
+            ArrayList<Item> itemList = new ArrayList<>();
+            String query = "SELECT item_id, company_id, quantity, item_name, notes FROM item";
+            PreparedStatement stmt = con.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Item item = new Item(
+                    rs.getInt("item_id"),
+                    rs.getInt("company_id"),
+                    rs.getInt("quantity"),
+                    rs.getString("item_name"),
+                    rs.getString("notes"),
+                    new ArrayList<history>() // You may want to load history separately
+                );
+                itemList.add(item);
+            }
+            rs.close();
+            stmt.close();
+            return itemList;
+        }
     private final Connection con;
     public ItemRepository(Connection con) {
         this.con = con;

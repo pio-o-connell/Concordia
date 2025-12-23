@@ -83,8 +83,9 @@ public class TransactionHistoryPanel extends JPanel {
                             historyTransactionStatusText.setText("");
                         } else {
                             int modelRow = transactionHistoryTable.convertRowIndexToModel(viewRow);
-                            // Example: controller.onHistorySelected(modelRow);
-                            historyTransactionStatusText.setText(String.format("History row selected: %d", modelRow));
+                            // Retrieve record from database and display in notes field
+                            String notes = controller.getHistoryNotesForRow(modelRow);
+                            historyTransactionStatusText.setText(notes != null ? notes : "No notes found.");
                         }
                     }
                 });
@@ -114,16 +115,15 @@ public class TransactionHistoryPanel extends JPanel {
 
         historyTransactionFilterTextLabel.setLabelFor(historyTransactionFilterText);
         transactionHistoryFormPanel.add(historyTransactionFilterText);
+        historyTransactionStatusText = new JTextArea("History for", 1, 4);
         JLabel historyTransactionNotesLabel = new JLabel("Notes:", SwingConstants.TRAILING);
         historyTransactionNotesLabel.setPreferredSize(new Dimension(50, 50));
         historyTransactionNotesLabel.setLabelFor(historyTransactionStatusText);
         transactionHistoryFormPanel.add(historyTransactionNotesLabel);
-        historyTransactionStatusText = new JTextArea("History for", 1, 4);
         historyTransactionStatusText.setPreferredSize(new Dimension(50, 50));
         historyTransactionStatusText.setEditable(true);
         JScrollPane scrollPane12 = new JScrollPane(historyTransactionStatusText);
         scrollPane12.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        // l23 removed, replaced by historyTransactionNotesLabel above
         transactionHistoryFormPanel.add(scrollPane12);
         SpringUtilites.makeCompactGrid(transactionHistoryFormPanel, 2, 2, 6, 6, 6, 6);
         add(transactionHistoryFormPanel);

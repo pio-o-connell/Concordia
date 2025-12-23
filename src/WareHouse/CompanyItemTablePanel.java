@@ -40,7 +40,6 @@ public class CompanyItemTablePanel extends JPanel {
     private final InventoryController controller;
     private static final long serialVersionUID = 1L;
     private static final boolean FALSE = false;
-    private static final boolean TRUE = false;
     private boolean DEBUG = false;
     public JTable companyTable;
     public JTextField companyFilterText;
@@ -113,19 +112,19 @@ public class CompanyItemTablePanel extends JPanel {
         companyFilterTextLabel.setPreferredSize(new Dimension(10, 10));
         companyFormPanel.add(companyFilterTextLabel);
         companyFilterText = new JTextField();
-        // Whenever companyFilterText changes, invoke newFilter.
+        // Whenever companyFilterText changes, invoke filterCompaniesTable.
         companyFilterText.getDocument().addDocumentListener(
                 new DocumentListener() {
                     public void changedUpdate(DocumentEvent e) {
-                        newFilter();
+                        filterCompaniesTable();
                     }
 
                     public void insertUpdate(DocumentEvent e) {
-                        newFilter();
+                        filterCompaniesTable();
                     }
 
                     public void removeUpdate(DocumentEvent e) {
-                        newFilter();
+                        filterCompaniesTable();
                     }
                 });
 
@@ -192,10 +191,9 @@ public class CompanyItemTablePanel extends JPanel {
                             itemStatusText.setText("");
                         } else {
                             int modelRow = itemTable.convertRowIndexToModel(viewRow);
-                            // Call controller method for item selection
-                            // Example: controller.onItemSelected(modelRow);
-                            // You may want to implement a method in InventoryController for this
-                            itemStatusText.setText(String.format(" Item selected: %d.", modelRow));
+                            // Retrieve item notes from database and display in notes field
+                            String notes = controller.getItemNotesForRow(modelRow);
+                            itemStatusText.setText(notes != null ? notes : "No notes found.");
                         }
                     }
                 });
@@ -203,15 +201,15 @@ public class CompanyItemTablePanel extends JPanel {
         itemFilterText.getDocument().addDocumentListener(
                 new DocumentListener() {
                     public void changedUpdate(DocumentEvent e) {
-                        newFilter2();
+                        filterItemsTable();
                     }
 
                     public void insertUpdate(DocumentEvent e) {
-                        newFilter2();
+                        filterItemsTable();
                     }
 
                     public void removeUpdate(DocumentEvent e) {
-                        newFilter2();
+                        filterItemsTable();
                     }
                 });
         itemFilterTextLabel.setLabelFor(itemFilterText);
@@ -228,7 +226,7 @@ public class CompanyItemTablePanel extends JPanel {
      * Update the row filter regular expression from the expression in
      * the text box.
      */
-    private void newFilter() {
+    private void filterCompaniesTable() {
         RowFilter<CompanyModel, Object> rf = null;
         try {
             rf = RowFilter.regexFilter(companyFilterText.getText(), 0);
@@ -236,10 +234,9 @@ public class CompanyItemTablePanel extends JPanel {
             return;
         }
         companyNameSorter.setRowFilter(rf);
-
     }
 
-    private void newFilter2() {
+    private void filterItemsTable() {
         RowFilter<ItemModel, Object> rf = null;
         try {
             rf = RowFilter.regexFilter(itemFilterText.getText(), 0);

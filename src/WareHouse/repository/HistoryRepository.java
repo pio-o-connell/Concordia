@@ -9,6 +9,28 @@ import WareHouse.domain.Company;
 import WareHouse.domain.Item;
 
 public class HistoryRepository {
+        // Retrieve all history records from the database
+        public ArrayList<history> getAllHistory() throws SQLException {
+            ArrayList<history> historyList = new ArrayList<>();
+            String query = "SELECT history_id, item_id, amount, location, provider, delivery_date, notes FROM history";
+            PreparedStatement stmt = con.prepareStatement(query);
+            java.sql.ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                history hist = new history(
+                    rs.getInt("history_id"),
+                    rs.getInt("item_id"),
+                    rs.getInt("amount"),
+                    rs.getString("location"),
+                    rs.getString("provider"),
+                    rs.getString("delivery_date"),
+                    rs.getString("notes")
+                );
+                historyList.add(hist);
+            }
+            rs.close();
+            stmt.close();
+            return historyList;
+        }
     private final Connection con;
     public HistoryRepository(Connection con) {
         this.con = con;

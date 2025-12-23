@@ -232,7 +232,7 @@ public final class Databases {
                 while (itemsResult.next()) {
                     int itemId = itemsResult.getInt(1);
                     int quantity = itemsResult.getInt(3);
-                    String itemName = itemsResult.getString("item_name");
+                    String itemName = itemsResult.getString("itemName");
                     String itemNotes = null;
                     try { itemNotes = itemsResult.getString("notes"); } catch (Exception e) { itemNotes = null; }
 

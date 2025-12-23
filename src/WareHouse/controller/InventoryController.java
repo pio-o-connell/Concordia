@@ -7,6 +7,30 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class InventoryController {
+            // Retrieve notes for an item by row index
+            public String getItemNotesForRow(int row) {
+                try {
+                    List<WareHouse.domain.Item> allItems = service.getAllItems();
+                    if (row >= 0 && row < allItems.size()) {
+                        return allItems.get(row).getNotes();
+                    }
+                } catch (Exception e) {
+                    return "Error retrieving notes: " + e.getMessage();
+                }
+                return null;
+            }
+        // Retrieve notes for a history record by row index
+        public String getHistoryNotesForRow(int row) {
+            try {
+                List<history> allHistory = service.getAllHistory();
+                if (row >= 0 && row < allHistory.size()) {
+                    return allHistory.get(row).getNotes();
+                }
+            } catch (Exception e) {
+                return "Error retrieving notes: " + e.getMessage();
+            }
+            return null;
+        }
     private final InventoryService service;
     public InventoryController(InventoryService service) {
         this.service = service;

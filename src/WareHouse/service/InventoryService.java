@@ -10,6 +10,14 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class InventoryService {
+            // Retrieve all items
+            public List<Item> getAllItems() throws SQLException {
+                return itemRepo.getAllItems();
+            }
+        // Retrieve all history records
+        public List<history> getAllHistory() throws SQLException {
+            return historyRepo.getAllHistory();
+        }
     private final CompanyRepository companyRepo;
     private final ItemRepository itemRepo;
     private final HistoryRepository historyRepo;
