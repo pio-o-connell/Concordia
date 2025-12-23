@@ -7,7 +7,7 @@
 ## Overview
 ---
 
-# concordia
+# Concordia
 
 **Project Overview:**  
 "Concordia" takes an old  **Java Swing** created in 2014, and uses **augmented AI**, to create a **swing front end locally and servlet for remote access from common code base**.  
@@ -36,7 +36,7 @@
 
 - [Concordia](#concordia)
   - [Overview](#overview)
-- [concordia](#concordia)
+- [Concordia](#concordia-1)
   - [Phases-one](#phases-one)
     - [Domain first](#domain-first)
   - [Phases-two](#phases-two)
