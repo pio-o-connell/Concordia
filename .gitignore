@@ -68,3 +68,19 @@ desktop.ini
 *.db
 *.sqlite
 *.sqlite3
+############################
+# Project-specific ignores
+############################
+jdk-25/
+jetty-home-12.1.5/
+jetty-base/
+bin/
+ConcordiaWAR/WEB-INF/classes/
+ConcordiaWAR/WEB-INF/lib/
+environments/
+*.ser
+*.txt
+*.docx
+*.bak
+*.tmp
+lib/
