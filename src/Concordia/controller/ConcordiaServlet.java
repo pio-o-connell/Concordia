@@ -11,17 +11,15 @@ import Concordia.domain.history;
 import Concordia.domain.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.util.*;
 
-@WebServlet("/api/concordia")
 public class ConcordiaServlet extends HttpServlet {
     private ObjectMapper mapper;
     private CompanyRepository companyRepo;
@@ -33,7 +31,7 @@ public class ConcordiaServlet extends HttpServlet {
     public void init() {
         try {
             Connection con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/WareHouse", "root", "password");
+                "jdbc:postgresql://127.0.0.1:5432/concordia", "postgres", "password");
             companyRepo = new CompanyRepository(con);
             itemRepo = new ItemRepository(con);
             historyRepo = new HistoryRepository(con);

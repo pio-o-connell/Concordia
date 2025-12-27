@@ -37,7 +37,7 @@ import javax.swing.BoxLayout;
 //import com.mysql.jdbc.Connection;
 
 /*------------------------------------------------------------------------------------------------------------------*/
-// AdminPanel Class facilitates the entry of item purchased transaction in the WareHouse Class.
+// AdminPanel Class facilitates the entry of item purchased transaction in the Concordia Class.
 // It's necessary to select a Supplier,then select an item from the item tables.
 // Unfortunately, there are issues setting a default selection in the windows on startup - this would guarantee the
 // system is in a steady state.It is but just not displayed.

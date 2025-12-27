@@ -55,7 +55,7 @@
     - [Annotations](#annotations)
     - [Decouple](#decouple)
     - [Annotations](#annotations-1)
-    - [Creating WAR file for project](#creating-war-file-for-project)
+    - [Maven Build  Build file for project](#maven-build--build-file-for-project)
   
 
 ## Phases-one
@@ -550,21 +550,74 @@ Everything dangerous stays behind it.
 [Back To Top](#swing---clean---layers)
 
 
-### Creating WAR file for project 
+### Maven Build  Build file for project 
 ---
 
 <details>
     <summary>Details
     </summary>
-    Semantic annotations are defined only as semantic markers- they do not carry meaning for humans (and future tools), but and have no runtime behaviour.
-    They:
-        do not create objects
-        do not inject dependencies
-        do not manage transactions
-        do not change execution
-    In this project @Service, @Repository, @Component, @Controller and @Transactional are used 
-    They exist to say:
-        “This class plays this role in the architecture.”
+ Full project structure
+    ```code
+    concordia/                     <-- project root <br> 
+├─ pom.xml                        <-- Maven POM (builds WAR + Swing JAR) <br> 
+├─ src/Concordia/                 <-- all Java source files <br> 
+│   ├─ annotations/               <-- custom backend annotations <br> 
+│   │   └─ (e.g., Repository.java, Service.java) <br> 
+│   ├─ controller/                <-- Servlets / REST controllers <br> 
+│   │   └─ ConcordiaServlet.java <br> 
+│   ├─ domain/                    <-- domain entities (backend) <br> 
+│   │   └─ Company.java <br> 
+│   │   └─ Item.java <br> 
+│   │   └─ User.java <br> 
+│   │   └─ History.java <br> 
+│   ├─ dto/                       <-- DTO classes <br> 
+│   │   └─ CompanyDto.java <br> 
+│   │   └─ ItemDto.java <br> 
+│   │   └─ UserDto.java <br> 
+│   │   └─ HistoryDto.java <br> 
+│   ├─ infrastructure/            <-- utility classes, configs <br> 
+│   │   └─ DBConnection.java <br> 
+│   │   └─ AppConfig.java <br> 
+│   ├─ repository/                <-- DAO / database access <br> 
+│   │   └─ CompanyRepository.java <br> 
+│   │   └─ ItemRepository.java <br> 
+│   │   └─ UserRepository.java <br> 
+│   │   └─ HistoryRepository.java <br> 
+│   ├─ service/                   <-- business logic <br> 
+│   │   └─ CompanyService.java <br> 
+│   │   └─ ItemService.java <br> 
+│   │   └─ UserService.java <br> 
+│   │   └─ HistoryService.java <br> 
+│   ├─ Main.java                  <-- Swing main class (entry point) <br> 
+│   ├─ MainDriver.java            <-- additional Swing launcher <br> 
+│   ├─ AdminPanel.java            <-- Swing admin panel <br> 
+│   ├─ CompanyItemTablePanel.java <-- Swing table panel <br> 
+│   └─ (any other Swing UI classes) <br> 
+├─ webapp/                        <-- web resources for WAR <br> 
+│   ├─ WEB-INF/ <br> 
+│   │   └─ web.xml                <-- optional servlet config <br> 
+│   └─ (static files / JSPs) <br> 
+├─ target/                        <-- Maven build output <br> 
+│   ├─ classes/                   <-- compiled .class files <br> 
+│   │   └─ Concordia/             <-- package folders reflect src/Concordia <br> 
+│   ├─ concordia-backend.war      <-- WAR for Jetty deployment <br> 
+│   └─ concordia-swing.jar        <-- Runnable Swing JAR <br> 
+
+
+Notes
+
+- Swing files (Main.java, MainDriver.java, AdminPanel.java, CompanyItemTablePanel.java) are directly under src/Concordia/.
+
+- Backend folders (controller, domain, dto, repository, service, etc.) are all in the same src/Concordia/ root.
+
+- Maven will compile all .java files in src/Concordia/ into target/classes/Concordia/....
+
+- The main.class in the POM should point to the class with the Swing main() method, e.g.:
+
+<main.class>Concordia.Main</main.class>
+
+
+- Your WAR will only include backend + web resources; the Swing JAR is separate.
 
 </details>
 <br>

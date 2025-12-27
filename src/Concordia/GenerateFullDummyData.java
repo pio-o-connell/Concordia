@@ -11,7 +11,7 @@ import Concordia.annotations.Configuration;
 @Configuration
 public class GenerateFullDummyData {
     public static void main(String[] args) throws Exception {
-        String url = "jdbc:mysql://127.0.0.1:3306/warehouse?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+        String url = "jdbc:mysql://127.0.0.1:3306/concordia?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
         String user = "root";
         String password = "ROOT";
         Connection con = DriverManager.getConnection(url, user, password);

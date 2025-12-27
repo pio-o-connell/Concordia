@@ -194,10 +194,10 @@ public final class Databases {
             }
 
             // Create tables
-            String createCompany = "CREATE TABLE company (Company_ID INT NOT NULL, Company_title CHAR(25) NULL, company_name VARCHAR(255) NULL, PRIMARY KEY(Company_ID)) ENGINE = InnoDB;";
-            String createUsers = "CREATE TABLE users (User_ID INT NOT NULL, User_Name CHAR(25) NULL, User_Password CHAR(25) NOT NULL, Company_ID INT NOT NULL, PRIMARY KEY(User_ID)) ENGINE = InnoDB;";
-            String createItem = "CREATE TABLE item (Item_ID INT NOT NULL AUTO_INCREMENT, Company_ID INT NOT NULL, quantity INT NULL, item_name CHAR(25) NULL, Location CHAR(25) NULL, Notes VARCHAR(200) NULL, PRIMARY KEY(Item_ID,Company_ID)) ENGINE = InnoDB;";
-            String createHistory = "CREATE TABLE history (history_id INT NOT NULL AUTO_INCREMENT, item_ID INT NOT NULL, amount INT NULL, location CHAR(25) NULL, provider CHAR(25) NULL, delivery_date CHAR(25) NULL, notes VARCHAR(200) NULL, PRIMARY KEY(history_id)) ENGINE = InnoDB;";
+            String createCompany = "CREATE TABLE company (Company_ID SERIAL PRIMARY KEY, Company_title VARCHAR(25), company_name VARCHAR(255));";
+            String createUsers = "CREATE TABLE users (User_ID SERIAL PRIMARY KEY, User_Name VARCHAR(25), User_Password VARCHAR(25) NOT NULL, Company_ID INT NOT NULL);";
+            String createItem = "CREATE TABLE item (Item_ID SERIAL PRIMARY KEY, Company_ID INT NOT NULL, quantity INT, item_name VARCHAR(25), Location VARCHAR(25), Notes VARCHAR(200));";
+            String createHistory = "CREATE TABLE history (history_id SERIAL PRIMARY KEY, item_ID INT NOT NULL, amount INT, location VARCHAR(25), provider VARCHAR(25), delivery_date VARCHAR(25), notes VARCHAR(200));";
             String[] createTables = {createCompany, createUsers, createItem, createHistory};
             for (String sql : createTables) {
                 try {

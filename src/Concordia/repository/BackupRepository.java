@@ -20,13 +20,13 @@ public class BackupRepository {
 
     public void backup(ArrayList<Company> Concordia) throws SQLException {
         try {
-            PreparedStatement statement = (PreparedStatement) con.prepareStatement("DROP DATABASE if exists BackupWareHouse");
+            PreparedStatement statement = (PreparedStatement) con.prepareStatement("DROP DATABASE if exists BackupConcordia");
             statement.executeUpdate();
 
-            statement = (PreparedStatement) con.prepareStatement("CREATE DATABASE BackupWareHouse");
+            statement = (PreparedStatement) con.prepareStatement("CREATE DATABASE BackupConcordia");
             statement.executeUpdate();
 
-            statement = (PreparedStatement) con.prepareStatement("USE BackupWareHouse");
+            statement = (PreparedStatement) con.prepareStatement("USE BackupConcordia");
             statement.executeUpdate();
 
             String query = "CREATE TABLE Company(" +

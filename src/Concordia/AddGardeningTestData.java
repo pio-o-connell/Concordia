@@ -13,9 +13,9 @@ import java.text.SimpleDateFormat;
  */
 public class AddGardeningTestData {
     public static void main(String[] args) throws Exception {
-        String url = "jdbc:mysql://127.0.0.1:3306/warehouse?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-        String user = "root";
-        String password = "ROOT";
+        String url = "jdbc:postgresql://127.0.0.1:5432/concordia";
+        String user = "postgres";
+        String password = "password";
         Connection con = DriverManager.getConnection(url, user, password);
         Statement stmt = con.createStatement();
         Random rand = new Random();

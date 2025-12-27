@@ -1,7 +1,7 @@
 package Concordia;
 //--------------------------------------------------------------------------//
 //
-// Backups up database(from memory) to BackupWareHouse on the server, this can subsequently be
+// Backups up database(from memory) to BackupConcordia on the server, this can subsequently be
 // retrieved and loaded. Part of main window functionality. Backup button..
 //
 //---------------------------------------------------------------------------------
@@ -38,13 +38,13 @@ public class DatabaseBackup {
         this.con = con1;
         try {
 
-            PreparedStatement statement = (PreparedStatement) con.prepareStatement("DROP DATABASE if exists BackupWareHouse");
+            PreparedStatement statement = (PreparedStatement) con.prepareStatement("DROP DATABASE if exists BackupConcordia");
             statement.executeUpdate();
 
-            statement = (PreparedStatement) con.prepareStatement("CREATE DATABASE BackupWareHouse");
+            statement = (PreparedStatement) con.prepareStatement("CREATE DATABASE BackupConcordia");
             statement.executeUpdate();
 
-            statement = (PreparedStatement) con.prepareStatement("USE BackupWareHouse");
+            statement = (PreparedStatement) con.prepareStatement("USE BackupConcordia");
             statement.executeUpdate();
 
             String query = "CREATE TABLE Company("
