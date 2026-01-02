@@ -7,7 +7,6 @@ import jakarta.persistence.TypedQuery;
 import java.util.List;
 import concordia.domain.Item;
 import concordia.domain.Company;
-import concordia.domain.History;
 
 @Repository
 public class ItemRepository {
@@ -43,7 +42,7 @@ public class ItemRepository {
         if (item != null) {
             em.remove(item);
         }
-        // Optionally, delete related History records if not handled by cascade
+        // Optionally, delete related history records if not handled by cascade
         em.getTransaction().commit();
     }
 }

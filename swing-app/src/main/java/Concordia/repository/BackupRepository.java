@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import concordia.domain.Company;
 import concordia.domain.Item;
 import concordia.domain.User;
-import concordia.domain.History;
+import concordia.domain.history;
 
 @Repository
 public class BackupRepository {
@@ -96,11 +96,11 @@ public class BackupRepository {
             System.out.println("Sizeof items array" + itemList0.size());
 
             // Convert Set to List for history
-            java.util.List<concordia.domain.History> historyList0 = itemList0.isEmpty() ? new java.util.ArrayList<>() : itemList0.get(0).getHistory();
+            java.util.List<concordia.domain.history> historyList0 = itemList0.isEmpty() ? new java.util.ArrayList<>() : itemList0.get(0).getHistory();
             System.out.println(historyList0.isEmpty() ? "No history" : historyList0.get(0).getLocation());
             System.out.println("Sizeof history array" + historyList0.size());
 
-            java.util.List<concordia.domain.History> historyList1 = itemList0.size() > 1 ? itemList0.get(1).getHistory() : new java.util.ArrayList<>();
+            java.util.List<concordia.domain.history> historyList1 = itemList0.size() > 1 ? itemList0.get(1).getHistory() : new java.util.ArrayList<>();
             System.out.println("Sizeof history array" + historyList1.size());
             System.out.println(historyList1.isEmpty() ? "No historyId" : historyList1.get(0).getHistoryId());
 
@@ -126,9 +126,9 @@ public class BackupRepository {
                     statement.setString(4, item.getItemName());
                     statement.executeUpdate();
 
-                    java.util.List<concordia.domain.History> historyList = item.getHistory();
+                    java.util.List<concordia.domain.history> historyList = item.getHistory();
                     for (int k = 0; k < historyList.size(); k++) {
-                        concordia.domain.History history = historyList.get(k);
+                        concordia.domain.history history = historyList.get(k);
                         statement = (PreparedStatement) con.prepareStatement("INSERT  INTO  history(HISTORY_ID,ITEM_id,AMOUNT,LOCATION,Supplier,DELIVERY_DATE)  VALUES  (?,?,?,?,?,?)");
                         statement.setInt(1, history.getHistoryId());
                         statement.setInt(2, item.getItemId());

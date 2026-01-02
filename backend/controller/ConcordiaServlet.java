@@ -1,93 +1,3 @@
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String type = req.getParameter("type");
-        try {
-            switch (type) {
-                case "item": {
-                    ItemDto dto = mapper.readValue(req.getInputStream(), ItemDto.class);
-                    itemRepo.insertNewItem(dto.companyId, dto.quantity, dto.itemName, dto.notes);
-                    resp.setStatus(HttpServletResponse.SC_CREATED);
-                    resp.getWriter().write("Item created");
-                    break;
-                }
-                case "history": {
-                    HistoryDto dto = mapper.readValue(req.getInputStream(), HistoryDto.class);
-                    historyRepo.insertHistory(dto.itemId, dto.amount, dto.location, dto.provider, dto.deliveryDate, dto.notes);
-                    resp.setStatus(HttpServletResponse.SC_CREATED);
-                    resp.getWriter().write("History created");
-                    break;
-                }
-                // Company and User creation would require additional repository methods
-                default:
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getWriter().write("POST not supported for type: " + type);
-            }
-        } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("Error: " + e.getMessage());
-        }
-    }
-
-    @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String type = req.getParameter("type");
-        try {
-            switch (type) {
-                case "item": {
-                    ItemDto dto = mapper.readValue(req.getInputStream(), ItemDto.class);
-                    itemRepo.deleteItem(dto.itemId);
-                    itemRepo.insertNewItem(dto.companyId, dto.quantity, dto.itemName, dto.notes);
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    resp.getWriter().write("Item updated");
-                    break;
-                }
-                case "history": {
-                    HistoryDto dto = mapper.readValue(req.getInputStream(), HistoryDto.class);
-                    historyRepo.updateHistory(new history(dto.historyId, dto.itemId, dto.amount, dto.location, dto.provider, dto.deliveryDate, dto.notes));
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    resp.getWriter().write("History updated");
-                    break;
-                }
-                // Company and User update would require additional repository methods
-                default:
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getWriter().write("PUT not supported for type: " + type);
-            }
-        } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("Error: " + e.getMessage());
-        }
-    }
-
-    @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String type = req.getParameter("type");
-        try {
-            switch (type) {
-                case "item": {
-                    int itemId = Integer.parseInt(req.getParameter("id"));
-                    itemRepo.deleteItem(itemId);
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    resp.getWriter().write("Item deleted");
-                    break;
-                }
-                case "history": {
-                    int historyId = Integer.parseInt(req.getParameter("id"));
-                    historyRepo.deleteHistory(historyId);
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    resp.getWriter().write("History deleted");
-                    break;
-                }
-                // Company and User delete would require additional repository methods
-                default:
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getWriter().write("DELETE not supported for type: " + type);
-            }
-        } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("Error: " + e.getMessage());
-        }
-    }
 package backend.controller;
 
 import backend.dto.*;
@@ -97,7 +7,7 @@ import Concordia.repository.HistoryRepository;
 import Concordia.repository.UserRepository;
 import concordia.domain.Company;
 import concordia.domain.Item;
-import concordia.domain.History;
+import concordia.domain.history;
 import concordia.domain.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

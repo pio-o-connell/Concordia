@@ -19,7 +19,7 @@ import java.util.Collections;
 import concordia.domain.Company;
 import concordia.domain.Item;
 import concordia.domain.User;
-import concordia.domain.History;
+import concordia.domain.history;
 // import concordia.domain.Index; // Removed: Index class does not exist
 import java.util.Date;
 
@@ -50,9 +50,9 @@ public class GenerateReport {
                 outputStream.println("Item Name: \t\t\tItem Id: \t\t Item Quantity: \t\tItem Location: ");
                 outputStream.println(item.getItemName()+"\t\t\t " +item.getItemId()+"\t\t\t" +item.getQuantity());
                 outputStream.println("\t\t\tHistory Location: \t\t\tHistoryId:  \t\t Amount: \t\tSupplier: \t\tDelivery Date: ");
-                java.util.List<concordia.domain.History> historyList = item.getHistory();
+                java.util.List<concordia.domain.history> historyList = item.getHistory();
                 for(int k=0;k<historyList.size();k++){
-                    concordia.domain.History history = historyList.get(k);
+                    concordia.domain.history history = historyList.get(k);
                     outputStream.println("\t\t\t "+ history.getLocation()+"\t\t\t "+ history.getHistoryId()+"\t\t"+history.getAmount()+"\t\t  "+ history.getSupplier()+"\t\t "+history.getDeliveryDate());
                 }
             }

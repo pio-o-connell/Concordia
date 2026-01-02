@@ -7,7 +7,7 @@
     <class>concordia.domain.Company</class>
     <class>concordia.domain.Item</class>
     <class>concordia.domain.User</class>
-    <class>concordia.domain.History</class>
+    <class>concordia.domain.history</class>
     <properties>
       <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/concordia"/>
       <property name="jakarta.persistence.jdbc.user" value="postgres"/>

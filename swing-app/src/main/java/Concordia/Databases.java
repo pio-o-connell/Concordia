@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import concordia.domain.Company;
 import concordia.domain.Item;
 import concordia.domain.User;
-import concordia.domain.History;
+import concordia.domain.history;
 
 public class Databases {
     @PersistenceContext
@@ -29,7 +29,7 @@ public class Databases {
     // Update a history record using JPA
     public void updateHistory(int historyId, String location, String supplier, String delivery, int quantity, String notes) {
         entityManager.getTransaction().begin();
-        History hist = entityManager.find(History.class, historyId);
+        history hist = entityManager.find(history.class, historyId);
         if (hist != null) {
             hist.setLocation(location);
             hist.setSupplier(supplier);

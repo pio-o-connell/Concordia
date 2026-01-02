@@ -5,7 +5,8 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "history")
-public class History implements Serializable {
+public class history implements Serializable {
+
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;
@@ -29,25 +30,21 @@ public class History implements Serializable {
     @Column(name = "history_id")
     private int historyId;
 
-        // Legacy no-arg constructor for ORM/compatibility
-        public History() {}
+    // No-arg constructor for JPA
+    public history() {}
 
-        // Legacy constructor for compatibility (without item)
-        public History(int historyId, int amount, String location, String provider, String deliveryDate, String notes) {
-            this.historyId = historyId;
-            this.amount = amount;
-            this.location = location;
-            this.provider = provider;
-            this.deliveryDate = deliveryDate;
-            this.notes = notes;
-        }
+    // Constructor matching tests (without Item reference)
+    public history(int historyId, int amount, String location, String provider, String deliveryDate, String notes) {
+        this.historyId = historyId;
+        this.amount = amount;
+        this.location = location;
+        this.provider = provider;
+        this.deliveryDate = deliveryDate;
+        this.notes = notes;
+    }
 
-        // Legacy getter/setter for itemId (dummy for compatibility)
-        public int getItemId() { return item != null ? item.getItemId() : 0; }
-        public void setItemId(int itemId) { /* no-op for compatibility */ }
-
-
-    public History(int historyId, Item item, int amount, String location, String provider, String deliveryDate, String notes) {
+    // Full constructor including associated Item
+    public history(int historyId, Item item, int amount, String location, String provider, String deliveryDate, String notes) {
         this.historyId = historyId;
         this.item = item;
         this.amount = amount;
@@ -56,6 +53,10 @@ public class History implements Serializable {
         this.deliveryDate = deliveryDate;
         this.notes = notes;
     }
+
+    // Legacy-style itemId accessors if needed
+    public int getItemId() { return item != null ? item.getItemId() : 0; }
+    public void setItemId(int itemId) { /* no-op for compatibility */ }
 
     public int getHistoryId() { return historyId; }
     public void setHistoryId(int historyId) { this.historyId = historyId; }
@@ -77,7 +78,10 @@ public class History implements Serializable {
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
-    // Compatibility methods for legacy code
+
+    // Compatibility methods for legacy code using "supplier"
     public String getSupplier() { return getProvider(); }
     public void setSupplier(String supplier) { setProvider(supplier); }
 }
+
+

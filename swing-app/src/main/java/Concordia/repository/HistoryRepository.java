@@ -5,7 +5,7 @@ import concordia.annotations.Repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
-import concordia.domain.History;
+import concordia.domain.history;
 import concordia.domain.Company;
 import concordia.domain.Item;
 
@@ -17,12 +17,12 @@ public class HistoryRepository {
     }
 
     // Retrieve all history records from the database using JPA
-    public List<History> getAllHistory() {
-        TypedQuery<History> query = em.createQuery("SELECT h FROM History h", History.class);
+    public List<history> getAllHistory() {
+        TypedQuery<history> query = em.createQuery("SELECT h FROM history h", history.class);
         return query.getResultList();
     }
 
-    public void updateHistory(History hist) {
+    public void updateHistory(history hist) {
         em.getTransaction().begin();
         em.merge(hist);
         em.getTransaction().commit();
@@ -30,7 +30,7 @@ public class HistoryRepository {
 
     public void deleteHistory(int historyId) {
         em.getTransaction().begin();
-        History hist = em.find(History.class, historyId);
+        history hist = em.find(history.class, historyId);
         if (hist != null) {
             em.remove(hist);
         }
@@ -39,7 +39,7 @@ public class HistoryRepository {
 
     public void insertHistory(int itemId, int amount, String location, String provider, String deliveryDate, String notes) {
         em.getTransaction().begin();
-            History hist = new History();
+            history hist = new history();
         hist.setItemId(itemId);
         hist.setAmount(amount);
         hist.setLocation(location);

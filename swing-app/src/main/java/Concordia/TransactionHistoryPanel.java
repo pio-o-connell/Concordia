@@ -1,5 +1,6 @@
 package concordia;
 import java.util.List;
+import java.util.function.Consumer;
 
 /*------------------------------------------------------------------------------------------------------------------*/
 //TableWindow2 Class retrieves the data structure (from memory) and renders the History tables.
@@ -16,51 +17,34 @@ import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.util.List;
-import java.util.Date;
 import concordia.domain.Company;
 import concordia.domain.Item;
-import concordia.domain.User;
-import concordia.domain.History;
+import concordia.domain.history;
 
-import concordia.controller.InventoryController;
 
 public class TransactionHistoryPanel extends JPanel {
-    private List<History> history;
-    private List<Company> companies;
-    private List<Item> items, item;
-
     private static final long serialVersionUID = 1L;
-    private boolean DEBUG = false;
-    public static JTable transactionHistoryTable;
-    private JTextField historyTransactionFilterText;
-    private JTextArea historyTransactionStatusText;
-    public TableRowSorter<MyTableModel> historyTransactionNameSorter;
-    public int nmrRowsTable3;
-    public MyTableModel transactionHistoryTableModel;
-    private final InventoryController controller;
+    private final JTable transactionHistoryTable;
+    private final JTextField historyTransactionFilterText;
+    private final JTextArea historyTransactionStatusText;
+    private final TableRowSorter<MyTableModel> historyTransactionNameSorter;
+    private final MyTableModel transactionHistoryTableModel;
+    private Consumer<history> historySelectionListener;
 
-        public TransactionHistoryPanel(List<Item> items, List<Company> companies, List<History> history,
-            InventoryController controller) {
-        super();
+        public TransactionHistoryPanel(List<Item> items, List<Company> companies, List<history> history) {
+        super(new java.awt.BorderLayout());
         setOpaque(true);
         setBackground(new java.awt.Color(255, 240, 240));
-        setMinimumSize(new java.awt.Dimension(300, 200));
-        setPreferredSize(new java.awt.Dimension(400, 300));
-        this.history = history;
-        this.items = items;
-        this.companies = companies;
-        this.controller = controller;
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        // Convert Set to List for indexed access
-        java.util.Set<Item> itemSet = companies.get(0).getItems();
-        java.util.List<Item> itemList = new java.util.ArrayList<>(itemSet);
-        java.util.List<History> historyList = itemList.isEmpty() ? new java.util.ArrayList<>() : itemList.get(0).getHistory();
+        setMinimumSize(new java.awt.Dimension(300, 220));
+        setPreferredSize(new java.awt.Dimension(900, 280));
+
+        // Use the full history list provided to this panel so all
+        // records are displayed in the table (not just the first
+        // company's first item's history).
+        java.util.List<history> historyList = (history != null)
+            ? new java.util.ArrayList<>(history)
+            : new java.util.ArrayList<>();
         transactionHistoryTableModel = new MyTableModel(historyList, 0);
         historyTransactionNameSorter = new TableRowSorter<MyTableModel>(transactionHistoryTableModel);
         transactionHistoryTable = new JTable(transactionHistoryTableModel) {
@@ -73,6 +57,7 @@ public class TransactionHistoryPanel extends JPanel {
         transactionHistoryTable.setRowHeight(24);
         transactionHistoryTable.setSelectionBackground(new java.awt.Color(255, 220, 220));
         transactionHistoryTable.setSelectionForeground(java.awt.Color.BLACK);
+        transactionHistoryTable.setFillsViewportHeight(true);
         transactionHistoryTable.setRowSorter(historyTransactionNameSorter);
         transactionHistoryTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
         transactionHistoryTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -86,22 +71,36 @@ public class TransactionHistoryPanel extends JPanel {
                         int viewRow = transactionHistoryTable.getSelectedRow();
                         if (viewRow < 0) {
                             historyTransactionStatusText.setText("");
+                            if (historySelectionListener != null) {
+                                historySelectionListener.accept(null);
+                            }
+                            return;
+                        }
+                        int modelRow = transactionHistoryTable.convertRowIndexToModel(viewRow);
+                        history selected = transactionHistoryTableModel.getHistoryAtRow(modelRow);
+                        String notes = (selected != null) ? selected.getNotes() : null;
+                        if (notes == null || notes.trim().isEmpty()) {
+                            historyTransactionStatusText.setText("No notes found.");
                         } else {
-                            int modelRow = transactionHistoryTable.convertRowIndexToModel(viewRow);
-                            // Retrieve record from database and display in notes field
-                            String notes = controller.getHistoryNotesForRow(modelRow);
-                            historyTransactionStatusText.setText(notes != null ? notes : "No notes found.");
+                            historyTransactionStatusText.setText(notes);
+                        }
+                        if (historySelectionListener != null) {
+                            historySelectionListener.accept(selected);
                         }
                     }
                 });
 
         JScrollPane transactionHistoryTableScrollPane = new JScrollPane(transactionHistoryTable);
-        add(transactionHistoryTableScrollPane);
-        JPanel transactionHistoryFormPanel = new JPanel(new SpringLayout());
+        transactionHistoryTableScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        add(transactionHistoryTableScrollPane, java.awt.BorderLayout.CENTER);
+
+        JPanel transactionHistoryFormPanel = new JPanel(new java.awt.GridBagLayout());
+        transactionHistoryFormPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 8, 8, 8));
         JLabel historyTransactionFilterTextLabel = new JLabel("Filter Text:", SwingConstants.TRAILING);
         historyTransactionFilterTextLabel.setPreferredSize(new Dimension(10, 10));
-        transactionHistoryFormPanel.add(historyTransactionFilterTextLabel);
         historyTransactionFilterText = new JTextField();
+        historyTransactionFilterText.setPreferredSize(new Dimension(Short.MAX_VALUE, 24));
+        historyTransactionFilterText.setMaximumSize(new Dimension(Short.MAX_VALUE, 24));
         // Whenever filterText changes, invoke newFilter.
         historyTransactionFilterText.getDocument().addDocumentListener(
                 new DocumentListener() {
@@ -117,21 +116,43 @@ public class TransactionHistoryPanel extends JPanel {
                         newFilter();
                     }
                 });
+    historyTransactionFilterTextLabel.setLabelFor(historyTransactionFilterText);
+    historyTransactionStatusText = new JTextArea("History for", 5, 20);
+    JLabel historyTransactionNotesLabel = new JLabel("Notes:", SwingConstants.TRAILING);
+    historyTransactionNotesLabel.setPreferredSize(new Dimension(50, 50));
+    historyTransactionNotesLabel.setLabelFor(historyTransactionStatusText);
+    historyTransactionStatusText.setLineWrap(true);
+    historyTransactionStatusText.setWrapStyleWord(true);
+    historyTransactionStatusText.setEditable(false);
+    JScrollPane scrollPane12 = new JScrollPane(historyTransactionStatusText);
+    scrollPane12.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-        historyTransactionFilterTextLabel.setLabelFor(historyTransactionFilterText);
-        transactionHistoryFormPanel.add(historyTransactionFilterText);
-        historyTransactionStatusText = new JTextArea("History for", 1, 4);
-        JLabel historyTransactionNotesLabel = new JLabel("Notes:", SwingConstants.TRAILING);
-        historyTransactionNotesLabel.setPreferredSize(new Dimension(50, 50));
-        historyTransactionNotesLabel.setLabelFor(historyTransactionStatusText);
-        transactionHistoryFormPanel.add(historyTransactionNotesLabel);
-        historyTransactionStatusText.setPreferredSize(new Dimension(50, 50));
-        historyTransactionStatusText.setEditable(true);
-        JScrollPane scrollPane12 = new JScrollPane(historyTransactionStatusText);
-        scrollPane12.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        transactionHistoryFormPanel.add(scrollPane12);
-        SpringUtilites.makeCompactGrid(transactionHistoryFormPanel, 2, 2, 6, 6, 6, 6);
-        add(transactionHistoryFormPanel);
+    java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
+    gbc.insets = new java.awt.Insets(0, 0, 8, 0);
+    gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
+
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    transactionHistoryFormPanel.add(historyTransactionFilterTextLabel, gbc);
+
+    gbc.gridx = 1;
+    gbc.weightx = 1.0;
+    gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    transactionHistoryFormPanel.add(historyTransactionFilterText, gbc);
+
+    gbc.gridx = 0;
+    gbc.gridy = 1;
+    gbc.weightx = 0;
+    gbc.fill = java.awt.GridBagConstraints.NONE;
+    gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    transactionHistoryFormPanel.add(historyTransactionNotesLabel, gbc);
+
+    gbc.gridx = 1;
+    gbc.weightx = 1.0;
+    gbc.weighty = 1.0;
+    gbc.fill = java.awt.GridBagConstraints.BOTH;
+    transactionHistoryFormPanel.add(scrollPane12, gbc);
+        add(transactionHistoryFormPanel, java.awt.BorderLayout.SOUTH);
     }
 
     /**
@@ -140,13 +161,44 @@ public class TransactionHistoryPanel extends JPanel {
      */
     private void newFilter() {
         RowFilter<MyTableModel, Object> rf = null;
-        // If current expression doesn't parse, don't update.
+        String filterText = historyTransactionFilterText.getText();
+        if (filterText == null || filterText.isEmpty()) {
+            historyTransactionNameSorter.setRowFilter(null);
+            return;
+        }
         try {
-            rf = RowFilter.regexFilter(historyTransactionFilterText.getText(), 0);
+            rf = RowFilter.regexFilter("(?i)" + filterText);
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
         historyTransactionNameSorter.setRowFilter(rf);
+    }
+
+    public void updateHistory(List<history> newHistory) {
+        updateHistory(newHistory, true);
+    }
+
+    public void updateHistory(List<history> newHistory, boolean autoSelectFirst) {
+        transactionHistoryTableModel.updateHistory(newHistory);
+        historyTransactionStatusText.setText("History for");
+        if (autoSelectFirst && transactionHistoryTable.getRowCount() > 0) {
+            transactionHistoryTable.setRowSelectionInterval(0, 0);
+        } else {
+            transactionHistoryTable.clearSelection();
+            if (historySelectionListener != null) {
+                historySelectionListener.accept(null);
+            }
+        }
+    }
+
+    public void selectFirstRow() {
+        if (transactionHistoryTable.getRowCount() > 0) {
+            transactionHistoryTable.setRowSelectionInterval(0, 0);
+        }
+    }
+
+    public void setHistorySelectionListener(Consumer<history> listener) {
+        this.historySelectionListener = listener;
     }
 
     public static class MyTableModel extends AbstractTableModel {
@@ -156,22 +208,32 @@ public class TransactionHistoryPanel extends JPanel {
                 "Location",
                 "Quantity",
                 "Supplier" };
-        private List<History> history;
-
-        @SuppressWarnings("deprecation")
+        private List<history> history;
         private Object[][] data;
 
-        public MyTableModel(List<History> history, int index1) {
-            this.history = history;
-            int index = index1;
-            int listSize = history.size();
+        public MyTableModel(List<history> history, int index1) {
+            updateHistory(history);
+        }
+
+        public void updateHistory(List<history> history) {
+            this.history = (history != null) ? new java.util.ArrayList<>(history) : java.util.Collections.emptyList();
+            int listSize = this.history.size();
             data = new Object[listSize][4];
             for (int i = 0; i < listSize; i++) {
-                data[i][0] = (Object) history.get(i).getDeliveryDate();
-                data[i][1] = (Object) history.get(i).getLocation();
-                data[i][2] = (Object) history.get(i).getAmount();
-                data[i][3] = (Object) history.get(i).getSupplier();
+                data[i][0] = this.history.get(i).getDeliveryDate();
+                data[i][1] = this.history.get(i).getLocation();
+                data[i][2] = this.history.get(i).getAmount();
+                data[i][3] = this.history.get(i).getSupplier();
             }
+            fireTableDataChanged();
+        }
+
+        // Helper to get the History entity associated with a given table row.
+        public history getHistoryAtRow(int row) {
+            if (row < 0 || row >= history.size()) {
+                return null;
+            }
+            return history.get(row);
         }
 
         public Object[][] convertTo2D() {
@@ -209,7 +271,11 @@ public class TransactionHistoryPanel extends JPanel {
          * rather than a check box.
          */
         public Class getColumnClass(int c) {
-            return getValueAt(0, c).getClass();
+            if (getRowCount() == 0) {
+                return Object.class;
+            }
+            Object value = getValueAt(0, c);
+            return (value == null) ? Object.class : value.getClass();
         }
 
         /*
@@ -231,19 +297,12 @@ public class TransactionHistoryPanel extends JPanel {
          * data can change.
          */
         public void setValueAt(Object value, int row, int col) {
-            if (data == null || data.length == 0)
+            if (row < 0 || row >= data.length) {
                 return;
-            if (row < 0 || row >= data.length)
+            }
+            if (data[row] == null || col < 0 || col >= data[row].length) {
                 return;
-            if (data[0] == null)
-                return;
-            // Defensive: check all rows for null and correct length
-            if (col < 0)
-                return;
-            if (row >= data.length)
-                return;
-            if (data[row] == null || col >= data[row].length)
-                return;
+            }
             data[row][col] = value;
             fireTableCellUpdated(row, col);
         }

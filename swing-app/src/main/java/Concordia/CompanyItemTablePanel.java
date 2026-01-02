@@ -13,31 +13,15 @@ package concordia;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.EventListenerList;
-//import javax.swing.JTable.tableChanged;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.util.List;
-import java.util.Date;
+import java.util.function.Consumer;
 import concordia.domain.Company;
 import concordia.domain.Item;
-import concordia.domain.User;
-import concordia.domain.History;
-
-import concordia.controller.InventoryController;
-import java.util.List;
 
 public class CompanyItemTablePanel extends JPanel {
-    private final InventoryController controller;
     private static final long serialVersionUID = 1L;
     private static final boolean FALSE = false;
     private boolean DEBUG = false;
@@ -51,28 +35,23 @@ public class CompanyItemTablePanel extends JPanel {
     public JTextField itemFilterText;
     public JTextArea itemStatusText;
     public TableRowSorter<ItemModel> itemNameSorter;
-    public final List<Item> items;
     public final List<Company> companies;
-    public final List<History> history;
     public ItemModel[] itemModelRefreshRef = new ItemModel[1];
     public CompanyModel[] companyModelRefreshRef = new CompanyModel[1];
+    private Consumer<Company> companySelectionListener;
+    private Consumer<Item> itemSelectionListener;
 
     // Code for first 2 windows i.e. company and items window
 
-        public CompanyItemTablePanel(List<Item> items, List<Company> companies, List<History> history,
-            InventoryController controller) {
+        public CompanyItemTablePanel(List<Company> companies) {
         super();
-        this.controller = controller;
         setOpaque(true);
         setBackground(new java.awt.Color(240, 240, 255));
-        this.history = history;
-        this.items = items;
         this.companies = companies;
 
-        // These are used as workaround for non closures in java
-        final ItemModel[] itemModel = new ItemModel[1];
-        final CompanyModel[] companyModel = new CompanyModel[1];
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        // Use a split pane so the company list consumes ~1/3 of the height and
+        // the item list the remaining 2/3.
+        setLayout(new java.awt.BorderLayout());
         companyModelRefreshRef[0] = new CompanyModel(this.companies);
         companyNameSorter = new TableRowSorter<CompanyModel>(companyModelRefreshRef[0]);
         companyTable = new JTable(companyModelRefreshRef[0]) {
@@ -93,20 +72,25 @@ public class CompanyItemTablePanel extends JPanel {
                             companyStatusText.setText("");
                         } else {
                             int modelRow = companyTable.convertRowIndexToModel(viewRow);
-                            // Call controller method for company selection
-                            controller.getAllCompanies(); // Replace with actual method if needed
-                            companyStatusText.setText(String.format(" Company selected: %d.", modelRow));
-                            // UI updates should be handled by controller callbacks or returned data
+                            Company selectedCompany = companyModelRefreshRef[0].getCompanyAtRow(modelRow);
+                            if (selectedCompany == null) {
+                                return;
+                            }
+                            companyStatusText.setText(String.format(" Company selected: %s.", selectedCompany.getCompanyName()));
+                            refreshItemsForCompany(selectedCompany);
+                            if (companySelectionListener != null) {
+                                companySelectionListener.accept(selectedCompany);
+                            }
                         }
                     }
                 });
         JScrollPane companyTableScrollPane = new JScrollPane(companyTable);
-        add(companyTableScrollPane);
-        JPanel companyFormPanel = new JPanel(new SpringLayout());
+        companyTableScrollPane.setPreferredSize(new Dimension(400, 160));
         JLabel companyFilterTextLabel = new JLabel("Filter Text:", SwingConstants.TRAILING);
         companyFilterTextLabel.setPreferredSize(new Dimension(10, 10));
-        companyFormPanel.add(companyFilterTextLabel);
         companyFilterText = new JTextField();
+        companyFilterText.setPreferredSize(new Dimension(Short.MAX_VALUE, 24));
+        companyFilterText.setMaximumSize(new Dimension(Short.MAX_VALUE, 24));
         // Whenever companyFilterText changes, invoke filterCompaniesTable.
         companyFilterText.getDocument().addDocumentListener(
                 new DocumentListener() {
@@ -122,50 +106,45 @@ public class CompanyItemTablePanel extends JPanel {
                         filterCompaniesTable();
                     }
                 });
-
-        companyFilterTextLabel.setLabelFor(companyFilterText);
-        companyFormPanel.add(companyFilterText);
-        JLabel companyNotesLabel = new JLabel("Notes:", SwingConstants.TRAILING);
-        companyNotesLabel.setPreferredSize(new Dimension(50, 50));
-        companyNotesLabel.setLabelFor(companyStatusText);
-        companyFormPanel.add(companyNotesLabel);
-        companyStatusText = new JTextArea("History for", 1, 4);
-        companyStatusText.setPreferredSize(new Dimension(50, 50));
-        companyStatusText.setEditable(true);
-        JScrollPane scrollPane1 = new JScrollPane(companyStatusText);
-        scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        companyFormPanel.add(companyNotesLabel);
-        companyFormPanel.add(scrollPane1);
-        SpringUtilites.makeCompactGrid(companyFormPanel, 2, 2, 6, 6, 6, 6);
+    companyFilterTextLabel.setLabelFor(companyFilterText);
+    JLabel companyNotesLabel = new JLabel("Notes:", SwingConstants.TRAILING);
+    companyNotesLabel.setPreferredSize(new Dimension(50, 50));
+    companyNotesLabel.setLabelFor(companyStatusText);
+    companyStatusText = new JTextArea("History for", 5, 20);
+    companyStatusText.setLineWrap(true);
+    companyStatusText.setWrapStyleWord(true);
+    companyStatusText.setEditable(false);
+    JPanel companyControlsPanel = createFilterAndNotesPanel(
+        companyFilterTextLabel,
+        companyFilterText,
+        companyNotesLabel,
+        companyStatusText);
 
         // --- FIX: Declare and initialize l12, l22, and form2 for the second
         // filter/notes panel ---
-        JPanel itemFormPanel = new JPanel(new SpringLayout());
         JLabel itemFilterTextLabel = new JLabel("Filter Text:", SwingConstants.TRAILING);
         itemFilterTextLabel.setPreferredSize(new Dimension(10, 10));
         itemFilterText = new JTextField();
+        itemFilterText.setPreferredSize(new Dimension(Short.MAX_VALUE, 24));
+        itemFilterText.setMaximumSize(new Dimension(Short.MAX_VALUE, 24));
         JLabel itemNotesLabel = new JLabel("Notes:", SwingConstants.TRAILING);
         itemNotesLabel.setPreferredSize(new Dimension(50, 50));
-        itemStatusText = new JTextArea("History for", 1, 4);
-        itemStatusText.setPreferredSize(new Dimension(50, 50));
-        itemStatusText.setEditable(true);
-        JScrollPane scrollPane12 = new JScrollPane(itemStatusText);
-        scrollPane12.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        // Add all 4 components in correct order
-        itemFormPanel.add(itemFilterTextLabel);
-        itemFormPanel.add(itemFilterText);
-        itemFormPanel.add(itemNotesLabel);
-        itemFormPanel.add(scrollPane12);
+        itemNotesLabel.setLabelFor(itemStatusText);
+        itemStatusText = new JTextArea("History for", 5, 20);
+        itemStatusText.setLineWrap(true);
+        itemStatusText.setWrapStyleWord(true);
+        itemStatusText.setEditable(false);
+        JPanel itemControlsPanel = createFilterAndNotesPanel(
+            itemFilterTextLabel,
+            itemFilterText,
+            itemNotesLabel,
+            itemStatusText);
 
         // Only show items for the first company on startup
-        int firstCompanyId = companies.get(0).getCompanyId();
-        List<Item> firstCompanyItems = new java.util.ArrayList<>();
-        for (Item item : items) {
-            if (item.getCompany() != null && item.getCompany().getCompanyId() == firstCompanyId) {
-                firstCompanyItems.add(item);
-            }
-        }
-        itemModelRefreshRef[0] = new ItemModel(firstCompanyItems, 0);
+        List<Item> initialItems = companies.isEmpty()
+                ? java.util.Collections.emptyList()
+                : new java.util.ArrayList<>(companies.get(0).getItems());
+        itemModelRefreshRef[0] = new ItemModel(initialItems, 0);
         itemNameSorter = new TableRowSorter<ItemModel>(itemModelRefreshRef[0]);
         itemTable = new JTable(itemModelRefreshRef[0]) {
             public boolean isCellEditable(int rowIndex, int colIndex) {
@@ -184,11 +163,25 @@ public class CompanyItemTablePanel extends JPanel {
                         int viewRow = itemTable.getSelectedRow();
                         if (viewRow < 0) {
                             itemStatusText.setText("");
+                            if (itemSelectionListener != null) {
+                                itemSelectionListener.accept(null);
+                            }
+                            return;
+                        }
+                        int modelRow = itemTable.convertRowIndexToModel(viewRow);
+                        Item selectedItem = itemModelRefreshRef[0].getItemAt(modelRow);
+                        if (selectedItem == null) {
+                            itemStatusText.setText("");
+                            return;
+                        }
+                        String notes = (selectedItem.getNotes() != null) ? selectedItem.getNotes() : "";
+                        if (notes.trim().isEmpty()) {
+                            itemStatusText.setText("No notes found.");
                         } else {
-                            int modelRow = itemTable.convertRowIndexToModel(viewRow);
-                            // Retrieve item notes from database and display in notes field
-                            String notes = controller.getItemNotesForRow(modelRow);
-                            itemStatusText.setText(notes != null ? notes : "No notes found.");
+                            itemStatusText.setText(notes);
+                        }
+                        if (itemSelectionListener != null) {
+                            itemSelectionListener.accept(selectedItem);
                         }
                     }
                 });
@@ -208,13 +201,111 @@ public class CompanyItemTablePanel extends JPanel {
                     }
                 });
         itemFilterTextLabel.setLabelFor(itemFilterText);
-        itemNotesLabel.setLabelFor(itemStatusText);
-        SpringUtilites.makeCompactGrid(itemFormPanel, 2, 2, 6, 6, 6, 6);
-        // Now that table2 is fully initialized, add it to the panel above the
-        // filter/notes
         JScrollPane itemTableScrollPane = new JScrollPane(itemTable);
-        add(itemTableScrollPane);
-        add(itemFormPanel);
+
+        JPanel companyPanel = new JPanel(new java.awt.BorderLayout());
+        JSplitPane companySplitPane = buildHorizontalSplit(
+            companyTableScrollPane,
+            companyControlsPanel,
+            0.65);
+        companyPanel.add(companySplitPane, java.awt.BorderLayout.CENTER);
+
+        JPanel itemPanel = new JPanel(new java.awt.BorderLayout());
+        JSplitPane itemSplitPane = buildHorizontalSplit(
+            itemTableScrollPane,
+            itemControlsPanel,
+            0.7);
+        itemPanel.add(itemSplitPane, java.awt.BorderLayout.CENTER);
+
+        javax.swing.JSplitPane splitPane = new javax.swing.JSplitPane(
+            javax.swing.JSplitPane.VERTICAL_SPLIT,
+            companyPanel,
+            itemPanel);
+        splitPane.setResizeWeight(0.33);
+        splitPane.setDividerLocation(0.33);
+        splitPane.setContinuousLayout(true);
+        splitPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        splitPane.setDividerSize(6);
+
+        add(splitPane, java.awt.BorderLayout.CENTER);
+    }
+
+    private JPanel createFilterAndNotesPanel(JLabel filterLabel, JTextField filterField,
+            JLabel notesLabel, JTextArea notesArea) {
+        JPanel panel = new JPanel(new java.awt.GridBagLayout());
+        panel.setOpaque(false);
+        panel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 12, 0, 0));
+        panel.setPreferredSize(new Dimension(320, 10));
+
+        java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
+        gbc.insets = new java.awt.Insets(0, 0, 8, 0);
+        gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(filterLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        panel.add(filterField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 0;
+        gbc.fill = java.awt.GridBagConstraints.NONE;
+        gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panel.add(notesLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = java.awt.GridBagConstraints.BOTH;
+        JScrollPane notesScrollPane = new JScrollPane(notesArea);
+        notesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        notesScrollPane.setPreferredSize(new Dimension(260, 160));
+        panel.add(notesScrollPane, gbc);
+
+        return panel;
+    }
+
+    private JSplitPane buildHorizontalSplit(JComponent leftComponent, JComponent rightComponent, double resizeWeight) {
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftComponent, rightComponent);
+        split.setResizeWeight(resizeWeight);
+        split.setContinuousLayout(true);
+        split.setDividerSize(6);
+        split.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        return split;
+    }
+
+    private void refreshItemsForCompany(Company company) {
+        List<Item> filteredItems = (company != null && company.getItems() != null)
+                ? new java.util.ArrayList<>(company.getItems())
+                : java.util.Collections.emptyList();
+        itemModelRefreshRef[0].updateModel(filteredItems);
+        itemTable.revalidate();
+        itemTable.repaint();
+        if (itemTable.getRowCount() > 0) {
+            itemTable.setRowSelectionInterval(0, 0);
+        } else if (itemSelectionListener != null) {
+            itemSelectionListener.accept(null);
+        }
+    }
+
+    public void setCompanySelectionListener(Consumer<Company> listener) {
+        this.companySelectionListener = listener;
+    }
+
+    public void setItemSelectionListener(Consumer<Item> listener) {
+        this.itemSelectionListener = listener;
+    }
+
+    public void initializeSelection() {
+        if (companyTable.getRowCount() > 0) {
+            companyTable.setRowSelectionInterval(0, 0);
+        } else if (itemSelectionListener != null) {
+            itemSelectionListener.accept(null);
+        }
     }
 
     /**
@@ -223,8 +314,13 @@ public class CompanyItemTablePanel extends JPanel {
      */
     private void filterCompaniesTable() {
         RowFilter<CompanyModel, Object> rf = null;
-        try {
-            rf = RowFilter.regexFilter(companyFilterText.getText(), 0);
+            String filterText = companyFilterText.getText();
+            if (filterText == null || filterText.isEmpty()) {
+                companyNameSorter.setRowFilter(null);
+                return;
+            }
+            try {
+                rf = RowFilter.regexFilter("(?i)" + filterText);
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
@@ -233,8 +329,13 @@ public class CompanyItemTablePanel extends JPanel {
 
     private void filterItemsTable() {
         RowFilter<ItemModel, Object> rf = null;
-        try {
-            rf = RowFilter.regexFilter(itemFilterText.getText(), 0);
+            String filterText = itemFilterText.getText();
+            if (filterText == null || filterText.isEmpty()) {
+                itemNameSorter.setRowFilter(null);
+                return;
+            }
+            try {
+                rf = RowFilter.regexFilter("(?i)" + filterText);
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
@@ -280,6 +381,13 @@ public class CompanyItemTablePanel extends JPanel {
 
         public Object getValueAt(int row, int col) {
             return data[row][col];
+        }
+
+        public Company getCompanyAtRow(int row) {
+            if (row < 0 || row >= company.size()) {
+                return null;
+            }
+            return company.get(row);
         }
 
         /*
@@ -401,13 +509,22 @@ public class CompanyItemTablePanel extends JPanel {
             return col == 1;
         }
 
+        public Item getItemAt(int row) {
+            if (row < 0 || row >= items.size()) {
+                return null;
+            }
+            return items.get(row);
+        }
+
         public void updateModel(List<Item> items) {
-            int listSize = items.size();
+            this.items = (items != null) ? new java.util.ArrayList<>(items) : java.util.Collections.emptyList();
+            int listSize = this.items.size();
             data = new Object[listSize][2];
             for (int i = 0; i < listSize; i++) {
-                data[i][0] = items.get(i).getItemName();
-                data[i][1] = items.get(i).getQuantity();
+                data[i][0] = this.items.get(i).getItemName();
+                data[i][1] = this.items.get(i).getQuantity();
             }
+            fireTableDataChanged();
         }
 
         /*

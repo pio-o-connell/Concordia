@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import concordia.domain.history;
 import jakarta.persistence.*;
 
 @Entity
@@ -37,12 +38,12 @@ public class Item implements Serializable {
 	private java.sql.Timestamp date;
 
 	@OneToMany(mappedBy = "item")
-	private List<History> historyItem = new ArrayList<>();
+	private List<history> historyItem = new ArrayList<>();
 
 	// Legacy no-arg constructor for ORM/compatibility
 	public Item() {}
 
-	// Legacy constructor for compatibility (without List<History>)
+	// Legacy constructor for compatibility (without List<history>)
 	public Item(int itemId, Company company, int quantity, String itemName, String location, String notes, java.sql.Timestamp date) {
 		this.itemId = itemId;
 		this.company = company;
@@ -59,14 +60,14 @@ public class Item implements Serializable {
 	public void setCompany(Company company) { this.company = company; }
 
 	// Legacy getter/setter for history (if not present)
-	public List<History> getHistory() { return historyItem; }
-	public void setHistory(List<History> history) { this.historyItem = history; }
+	public List<history> getHistory() { return historyItem; }
+	public void setHistory(List<history> history) { this.historyItem = history; }
 
 	// Legacy getter/setter for supplier (dummy for compatibility)
 	public String getSupplier() { return null; }
 	public void setSupplier(String supplier) { /* no-op for compatibility */ }
 	// ORM constructor
-	public Item(int itemId, Company company, int quantity, String itemName, String location, String notes, java.sql.Timestamp date, List<History> historyItem) {
+	public Item(int itemId, Company company, int quantity, String itemName, String location, String notes, java.sql.Timestamp date, List<history> historyItem) {
 		this.itemId = itemId;
 		this.company = company;
 		this.quantity = quantity;
@@ -100,8 +101,8 @@ public class Item implements Serializable {
 	public java.sql.Timestamp getDate() { return date; }
 	public void setDate(java.sql.Timestamp date) { this.date = date; }
 
-	public List<History> getHistoryItem() { return historyItem; }
-	public void setHistoryItem(List<History> historyItem) { this.historyItem = historyItem; }
+	public List<history> getHistoryItem() { return historyItem; }
+	public void setHistoryItem(List<history> historyItem) { this.historyItem = historyItem; }
 
 }
 

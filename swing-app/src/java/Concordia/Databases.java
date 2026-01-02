@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import concordia.domain.Company;
 import concordia.domain.Item;
 import concordia.domain.User;
-import concordia.domain.History;
+import concordia.domain.history;
 
 public class Databases {
     @PersistenceContext

@@ -7,7 +7,7 @@ import concordia.repository.ItemRepository;
 import concordia.repository.HistoryRepository;
 import concordia.domain.Company;
 import concordia.domain.Item;
-import concordia.domain.History;
+import concordia.domain.history;
 import java.util.List;
 
 @Service
@@ -27,7 +27,7 @@ public class InventoryService {
     }
 
     // Retrieve all history records
-    public List<History> getAllHistory() {
+    public List<history> getAllHistory() {
         return historyRepo.getAllHistory();
     }
 
@@ -48,7 +48,7 @@ public class InventoryService {
         historyRepo.insertHistory(itemId, amount, location, provider, deliveryDate, notes);
     }
 
-    public void updateHistory(History hist) {
+    public void updateHistory(history hist) {
         historyRepo.updateHistory(hist);
     }
 

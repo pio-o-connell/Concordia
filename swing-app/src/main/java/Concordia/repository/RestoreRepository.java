@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import concordia.domain.Company;
 import concordia.domain.Item;
 import concordia.domain.User;
-import concordia.domain.History;
+import concordia.domain.history;
 
 @Repository
 public class RestoreRepository {
@@ -28,7 +28,7 @@ public class RestoreRepository {
 
             java.util.Set<Item> Item11 = new java.util.HashSet<>();
             java.util.Set<User> User11 = new java.util.HashSet<>();
-            List<History> history11;
+            List<history> history11;
 
             while (itemsResult.next()) {
                 PreparedStatement statement1 = (PreparedStatement) con.prepareStatement("SELECT * FROM HISTORY WHERE ITEM_ID="
@@ -37,7 +37,7 @@ public class RestoreRepository {
                 history11 = new java.util.ArrayList<>();
                 while (historyResult.next()) {
                     // Fix: pass null for Item in History constructor, as only historyId, item, amount, location, provider, deliveryDate, notes are expected
-                    history11.add(new History(
+                    history11.add(new history(
                         historyResult.getInt(1), // historyId
                         null, // Item (not available here)
                         historyResult.getInt(2), // amount

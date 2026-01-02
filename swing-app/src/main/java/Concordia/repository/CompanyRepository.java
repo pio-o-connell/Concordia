@@ -9,7 +9,6 @@ import java.util.List;
 import concordia.domain.Company;
 import concordia.domain.Item;
 import concordia.domain.User;
-import concordia.domain.History;
 
 @Repository
 public class CompanyRepository {

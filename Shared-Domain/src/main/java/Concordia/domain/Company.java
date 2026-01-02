@@ -12,6 +12,7 @@ public class Company implements Serializable {
     @Column(name = "company_id")
     private int companyId;
 
+
     @Column(name = "company_title", length = 25)
     private String companyTitle;
 
@@ -24,24 +25,32 @@ public class Company implements Serializable {
     @OneToMany(mappedBy = "company")
     private java.util.Set<User> users = new java.util.HashSet<>();
 
-        // Legacy no-arg constructor for ORM/compatibility
-        public Company() {}
 
-        // Legacy constructor for compatibility (without users)
-        public Company(int companyId, String companyTitle, String companyName, java.util.Set<Item> items) {
-            this.companyId = companyId;
-            this.companyTitle = companyTitle;
-            this.companyName = companyName;
-            this.items = items;
-            this.users = new java.util.HashSet<>();
+    // No-arg constructor for JPA and tests
+    public Company() {
+    }
+
+
+    public java.util.ArrayList<Item> getItemsAsList() {
+        return new java.util.ArrayList<>(items);
+    }
+
+    public java.util.ArrayList<User> getUsersAsList() {
+        return new java.util.ArrayList<>(users);
+    }
+
+    // Convenience helper used in tests to add items
+    public void addItem(Item item) {
+        if (item == null) {
+            return;
         }
+        if (items == null) {
+            items = new java.util.HashSet<>();
+        }
+        items.add(item);
+        item.setCompany(this);
+    }
 
-        // Legacy getter/setter for items (if not present)
-        public void addItem(Item item) { this.items.add(item); }
-
-        // Legacy getter/setter for companyId (if not present)
-        public int getId() { return companyId; }
-        public void setId(int id) { this.companyId = id; }
 
     public Company(int companyId, String companyTitle, String companyName, java.util.Set<Item> items, java.util.Set<User> users) {
         this.companyId = companyId;

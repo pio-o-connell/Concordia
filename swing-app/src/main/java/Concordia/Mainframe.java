@@ -1,7 +1,13 @@
 package concordia;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import javax.swing.JFrame;
 import concordia.controller.InventoryController;
+import concordia.domain.Company;
+import concordia.domain.Item;
+import concordia.domain.history;
 
 public class Mainframe extends JFrame {
     public Mainframe(String title, InventoryController controller) {
@@ -13,29 +19,60 @@ public class Mainframe extends JFrame {
         setLayout(new java.awt.BorderLayout());
 
         AdminPanel adminPanel = new AdminPanel(controller);
-        java.util.List<concordia.domain.Item> items = new java.util.ArrayList<>();
-        if (!controller.getAllCompanies().isEmpty()) {
-            java.util.Set<concordia.domain.Item> itemSet = controller.getAllCompanies().get(0).getItems();
-            items.addAll(itemSet);
-        }
-        java.util.List<concordia.domain.Company> companies = controller.getAllCompanies();
-        java.util.List<concordia.domain.History> history = controller.getAllHistory();
-        TransactionHistoryPanel transactionHistoryPanel = new TransactionHistoryPanel(items, companies, history, controller);
+        List<Company> companies = new ArrayList<>(controller.getAllCompanies());
 
-        // Use JSplitPane to split AdminPanel (WEST) and TransactionHistoryPanel (EAST)
+        CompanyItemTablePanel companyItemPanel = new CompanyItemTablePanel(companies);
+        TransactionHistoryPanel transactionHistoryPanel = new TransactionHistoryPanel(Collections.emptyList(), companies, Collections.emptyList());
+
+        final Company[] currentCompany = new Company[1];
+        final Item[] currentItem = new Item[1];
+
+        transactionHistoryPanel.setHistorySelectionListener(historyEntry -> {
+            Company activeCompany = currentCompany[0];
+            Item activeItem = currentItem[0];
+            adminPanel.displaySelection(activeCompany, activeItem, historyEntry);
+        });
+
+        companyItemPanel.setCompanySelectionListener(company -> {
+            currentCompany[0] = company;
+            adminPanel.displaySelection(company, null, null);
+        });
+        companyItemPanel.setItemSelectionListener(item -> {
+            Company activeCompany = currentCompany[0];
+            currentItem[0] = item;
+            List<history> historyList = (item != null && item.getHistory() != null)
+                    ? new ArrayList<>(item.getHistory())
+                    : Collections.emptyList();
+            transactionHistoryPanel.updateHistory(historyList);
+            if (historyList.isEmpty()) {
+                adminPanel.displaySelection(activeCompany, item, null);
+            }
+        });
+
         javax.swing.JScrollPane adminScrollPane = new javax.swing.JScrollPane(adminPanel);
-        adminScrollPane.setPreferredSize(new java.awt.Dimension(800, 700));
-        javax.swing.JScrollPane transactionScrollPane = new javax.swing.JScrollPane(transactionHistoryPanel);
-        transactionScrollPane.setPreferredSize(new java.awt.Dimension(400, 700));
-        javax.swing.JSplitPane splitPane = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, adminScrollPane, transactionScrollPane);
-        splitPane.setDividerLocation(800);
-        splitPane.setResizeWeight(0.67);
-        splitPane.setContinuousLayout(true);
-        add(splitPane, java.awt.BorderLayout.CENTER);
+        adminScrollPane.setPreferredSize(new java.awt.Dimension(560, 680));
+        adminScrollPane.setMinimumSize(new java.awt.Dimension(400, 680));
+        adminScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 
-        // Add another TransactionHistoryPanel to SOUTH (history table)
-        TransactionHistoryPanel transactionHistoryPanelSouth = new TransactionHistoryPanel(items, companies, history, controller);
-        add(transactionHistoryPanelSouth, java.awt.BorderLayout.SOUTH);
+        javax.swing.JScrollPane companyScrollPane = new javax.swing.JScrollPane(companyItemPanel);
+        companyScrollPane.setPreferredSize(new java.awt.Dimension(520, 680));
+        companyScrollPane.setMinimumSize(new java.awt.Dimension(360, 680));
+        companyScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+
+        javax.swing.JSplitPane splitPane = new javax.swing.JSplitPane(
+            javax.swing.JSplitPane.HORIZONTAL_SPLIT,
+            adminScrollPane,
+            companyScrollPane);
+        splitPane.setDividerLocation(580);
+        splitPane.setResizeWeight(0.5);
+        splitPane.setContinuousLayout(true);
+        splitPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+
+        add(splitPane, java.awt.BorderLayout.CENTER);
+        add(transactionHistoryPanel, java.awt.BorderLayout.SOUTH);
+
+        companyItemPanel.initializeSelection();
+        transactionHistoryPanel.selectFirstRow();
     }
 }
 

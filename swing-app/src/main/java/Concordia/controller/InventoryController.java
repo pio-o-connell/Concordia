@@ -3,7 +3,7 @@ package concordia.controller;
 import concordia.annotations.Controller;
 import concordia.service.InventoryService;
 import concordia.domain.Company;
-import concordia.domain.History;
+import concordia.domain.history;
 import java.util.List;
 
 @Controller
@@ -24,7 +24,7 @@ public class InventoryController {
 
     // Retrieve notes for a history record by row index
     public String getHistoryNotesForRow(int row) {
-        List<History> allHistory = service.getAllHistory();
+        List<history> allHistory = service.getAllHistory();
         if (row >= 0 && row < allHistory.size()) {
             return allHistory.get(row).getNotes();
         }
@@ -40,13 +40,13 @@ public class InventoryController {
     public void deleteItem(int itemId) {
         service.deleteItem(itemId);
     }
-        public java.util.List<concordia.domain.History> getAllHistory() {
+        public java.util.List<concordia.domain.history> getAllHistory() {
             return service.getAllHistory();
         }
     public void addHistory(int itemId, int amount, String location, String provider, String deliveryDate, String notes) {
         service.addHistory(itemId, amount, location, provider, deliveryDate, notes);
     }
-    public void updateHistory(History hist) {
+    public void updateHistory(history hist) {
         service.updateHistory(hist);
     }
     public void deleteHistory(int historyId) {

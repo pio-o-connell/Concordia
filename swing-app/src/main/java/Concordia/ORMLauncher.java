@@ -11,7 +11,6 @@ import concordia.controller.InventoryController;
 import concordia.domain.Company;
 import concordia.domain.Item;
 import concordia.domain.User;
-import concordia.domain.History;
 import javax.swing.SwingUtilities;
 
 public class ORMLauncher {

@@ -70,6 +70,9 @@ import javax.swing.BoxLayout;
 // with JTextStrings.
 /*-------------------------------------------------------------------------------------------------------------------*/
 import concordia.controller.InventoryController;
+import concordia.domain.Company;
+import concordia.domain.Item;
+import concordia.domain.history;
 
 public class AdminPanel extends JPanel {
     /**
@@ -92,6 +95,32 @@ public class AdminPanel extends JPanel {
     // Add a setter for currentCompanyField
     public void setCurrentCompanyField(String name) {
         currentCompanyField.setText(name);
+    }
+
+    public void displaySelection(Company company, Item item, history historyEntry) {
+        setCurrentCompanyField(company != null ? company.getCompanyName() : "");
+        if (historyEntry != null) {
+            setFields(
+                (item != null && item.getItemName() != null) ? item.getItemName() : "",
+                safe(historyEntry.getLocation()),
+                safe(historyEntry.getSupplier()),
+                safe(historyEntry.getDeliveryDate()),
+                String.valueOf(historyEntry.getAmount())
+            );
+            notesArea.setText(safe(historyEntry.getNotes()));
+        } else if (item != null) {
+            setFields(
+                safe(item.getItemName()),
+                safe(item.getLocation()),
+                "",
+                item.getDate() != null ? item.getDate().toString() : "",
+                String.valueOf(item.getQuantity())
+            );
+            notesArea.setText(safe(item.getNotes()));
+        } else {
+            setFields("", "", "", "", "");
+            notesArea.setText("");
+        }
     }
 
     private static final long serialVersionUID = 1L;
@@ -319,6 +348,10 @@ public class AdminPanel extends JPanel {
 
         return date;
 
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
     }
 
 }

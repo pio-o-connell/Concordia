@@ -50,7 +50,7 @@ public class Serialized {
             ArrayList<Company> restoredList =(ArrayList<Company> )os.readObject();
             java.util.Set<concordia.domain.Item> itemSet = restoredList.get(0).getItems();
             java.util.List<concordia.domain.Item> itemList = new java.util.ArrayList<>(itemSet);
-            java.util.List<concordia.domain.History> historyList = itemList.isEmpty() ? new java.util.ArrayList<>() : itemList.get(0).getHistory();
+            java.util.List<concordia.domain.history> historyList = itemList.isEmpty() ? new java.util.ArrayList<>() : itemList.get(0).getHistory();
             String location = historyList.isEmpty() ? null : historyList.get(0).getLocation();
             System.out.println("Location" + location);
             os.close();
