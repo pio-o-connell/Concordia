@@ -1,6 +1,9 @@
 # Concordia
 
+Swing app:
 <img src="documentation/images/java-swing-widget.jpg" alt="Widget" style="width:60%;">
+
+<img src="./servlet-running.jpg" alt="Servlet" style="width:60%;">
 
 ## Overview
 
@@ -28,12 +31,14 @@
 -   Integration of **augmented AI tools** to enhance development speed and functionality.
 -   Fully **responsive design** for **Servlet** with attention to accessibility and user experience.
 
-**Live Project:** [Harmonia](#)
+**Live Project:** [Harmonia](./swing-running.jpg)
 
 <h2 align="center" id="TOC">Index</h2>
 
 -   [Concordia](#concordia)
     -   [Overview](#overview)
+    -   [Configuration](#configuration)
+    -   [Schema](#postgres-schema)
 -   [Concordia](#concordia-1)
     -   [Phases-one](#phases-one)
         -   [Domain first](#domain-first)
@@ -56,7 +61,144 @@
     -   [Maven](#maven)
         -   [Maven Build Build file for project](#maven-build-build-file-for-project)
         -   [Adding Test Harness for Swing and servlet](#adding-test-harness-for-swing-and-servlet)
-    -   [Adding JPA and Hibernate](#adding-jpa-and-hibernate)
+    -   ## [Adding JPA and Hibernate](#adding-jpa-and-hibernate)
+
+## Postgres setup
+
+---
+
+### Configuration
+
+---
+
+<details>
+    <summary>Details
+    </summary>
+            EDB Postgres® AI
+            Get Postgres from a Builder, Not a
+
+            18.1-2
+
+            Set postgres password.
+
+            Select default port 5432.
+
+            Include pgAdmin for GUI management.
+
+            Host: localhost
+
+            Port: 5432 (default)
+
+            Username: postgres
+
+            Password: the one you set during installation
+
+            sysdm.cpl
+
+            psql -U postgres -h 127.0.0.1 -p 5432 -d concordia
+
+</details>
+<br>
+
+[Back To Top](#configuration)
+
+## Postgres schema
+
+---
+
+<details>
+    <summary>Details
+    </summary>
+    ### Bullet list
+
+\d+ company
+\d+ item
+\d+ users
+\d+ history
+
+\dt
+List of tables
+Schema | Name | Type | Owner
+--------+---------+-------+----------
+public | company | table | postgres
+public | history | table | postgres
+public | item | table | postgres
+public | users | table | postgres
+(4 rows)
+
+concordia=# select\d+ company
+Table "public.company"
+Column | Type | Collation | Nullable | Default | Storage | Compression | Stats target | Description
+---------------+------------------------+-----------+----------+---------------------------------------------+----------+-------------+--------------+-------------
+company_id | integer | | not null | nextval('company_company_id_seq'::regclass) | plain | | |
+company_title | character varying(25) | | | | extended | | |
+company_name | character varying(255) | | | | extended | | |
+Indexes:
+"company_pkey" PRIMARY KEY, btree (company_id)
+Not-null constraints:
+"company_company_id_not_null" NOT NULL "company_id"
+Access method: heap
+
+concordia-# \d+ item
+Table "public.item"
+Column | Type | Collation | Nullable | Default | Storage | Compression | Stats target | Description
+------------+--------------------------------+-----------+----------+---------------------------------------+----------+-------------+--------------+-------------
+item_id | integer | | not null | nextval('item_item_id_seq'::regclass) | plain | | |
+company_id | integer | | not null | | plain | | |
+quantity | integer | | | | plain | | |
+item_name | character varying(25) | | | | extended | | |
+location | character varying(25) | | | | extended | | |
+notes | character varying(200) | | | | extended | | |
+date | timestamp(6) without time zone | | | | plain | | |
+Indexes:
+"item_pkey" PRIMARY KEY, btree (item_id)
+Referenced by:
+TABLE "history" CONSTRAINT "fkbtex7kw1vv34hjdy08rx6d1q5" FOREIGN KEY (item_id) REFERENCES item(item_id)
+Not-null constraints:
+"item_item_id_not_null" NOT NULL "item_id"
+"item_company_id_not_null" NOT NULL "company_id"
+Access method: heap
+
+concordia-# \d+ users
+Table "public.users"
+Column | Type | Collation | Nullable | Default | Storage | Compression | Stats target | Description
+---------------+-----------------------+-----------+----------+----------------------------------------+----------+-------------+--------------+-------------
+user_id | integer | | not null | nextval('users_user_id_seq'::regclass) | plain | | |
+user_name | character varying(25) | | | | extended | | |
+user_password | character varying(25) | | not null | | extended | | |
+company_id | integer | | not null | | plain | | |
+Indexes:
+"users_pkey" PRIMARY KEY, btree (user_id)
+Not-null constraints:
+"users_user_id_not_null" NOT NULL "user_id"
+"users_user_password_not_null" NOT NULL "user_password"
+"users_company_id_not_null" NOT NULL "company_id"
+Access method: heap
+
+concordia-# \d+ history
+Table "public.history"
+Column | Type | Collation | Nullable | Default | Storage | Compression | Stats target | Description
+---------------+------------------------+-----------+----------+---------------------------------------------+----------+-------------+--------------+-------------
+history_id | integer | | not null | nextval('history_history_id_seq'::regclass) | plain | | |
+item_id | integer | | not null | | plain | | |
+amount | integer | | | | plain | | |
+location | character varying(25) | | | | extended | | |
+provider | character varying(25) | | | | extended | | |
+delivery_date | character varying(25) | | | | extended | | |
+notes | character varying(200) | | | | extended | | |
+Indexes:
+"history_pkey" PRIMARY KEY, btree (history_id)
+Foreign-key constraints:
+"fkbtex7kw1vv34hjdy08rx6d1q5" FOREIGN KEY (item_id) REFERENCES item(item_id)
+Not-null constraints:
+"history_history_id_not_null" NOT NULL "history_id"
+"history_item_id_not_null" NOT NULL "item_id"
+Access method: heap
+
+</details>
+<br>
+
+[Back To Top](#postgres-schema)
 
 ## Phases-one
 
@@ -310,8 +452,13 @@
 
 [Back To Top](#concordia)
 
-Phase 7 – Kill legacy shortcuts
+## Phase 7 – Kill legacy shortcuts
 
+---
+
+<details>
+    <summary>Details
+    </summary>
 Only now:
 
 fully remove the old main or further refactor!
@@ -340,6 +487,7 @@ Annotations are labels, not magic:
 @Component
 
 </details>
+
 <br>
 
 [Back To Top](#concordia)
@@ -490,7 +638,7 @@ Everything dangerous stays behind it.
 
 [Back To Top](#concordia)
 
-### Annotations
+### Decoupling
 
 ---
 
@@ -527,52 +675,53 @@ Everything dangerous stays behind it.
 <details>
     <summary>Details
     </summary>
- Full project structure
-    ```code
-    concordia/                     <-- project root <br> 
-├─ pom.xml                        <-- Maven POM (builds WAR + Swing JAR) <br> 
-├─ src/Concordia/                 <-- all Java source files <br> 
-│   ├─ annotations/               <-- custom backend annotations <br> 
-│   │   └─ (e.g., Repository.java, Service.java) <br> 
-│   ├─ controller/                <-- Servlets / REST controllers <br> 
-│   │   └─ ConcordiaServlet.java <br> 
-│   ├─ domain/                    <-- domain entities (backend) <br> 
-│   │   └─ Company.java <br> 
-│   │   └─ Item.java <br> 
-│   │   └─ User.java <br> 
-│   │   └─ History.java <br> 
-│   ├─ dto/                       <-- DTO classes <br> 
-│   │   └─ CompanyDto.java <br> 
-│   │   └─ ItemDto.java <br> 
-│   │   └─ UserDto.java <br> 
-│   │   └─ HistoryDto.java <br> 
-│   ├─ infrastructure/            <-- utility classes, configs <br> 
-│   │   └─ DBConnection.java <br> 
-│   │   └─ AppConfig.java <br> 
-│   ├─ repository/                <-- DAO / database access <br> 
-│   │   └─ CompanyRepository.java <br> 
-│   │   └─ ItemRepository.java <br> 
-│   │   └─ UserRepository.java <br> 
-│   │   └─ HistoryRepository.java <br> 
-│   ├─ service/                   <-- business logic <br> 
-│   │   └─ CompanyService.java <br> 
-│   │   └─ ItemService.java <br> 
-│   │   └─ UserService.java <br> 
-│   │   └─ HistoryService.java <br> 
-│   ├─ Main.java                  <-- Swing main class (entry point) <br> 
-│   ├─ MainDriver.java            <-- additional Swing launcher <br> 
-│   ├─ AdminPanel.java            <-- Swing admin panel <br> 
-│   ├─ CompanyItemTablePanel.java <-- Swing table panel <br> 
-│   └─ (any other Swing UI classes) <br> 
-├─ webapp/                        <-- web resources for WAR <br> 
-│   ├─ WEB-INF/ <br> 
-│   │   └─ web.xml                <-- optional servlet config <br> 
-│   └─ (static files / JSPs) <br> 
-├─ target/                        <-- Maven build output <br> 
-│   ├─ classes/                   <-- compiled .class files <br> 
-│   │   └─ Concordia/             <-- package folders reflect src/Concordia <br> 
-│   ├─ concordia-backend.war      <-- WAR for Jetty deployment <br> 
-│   └─ concordia-swing.jar        <-- Runnable Swing JAR <br>
+    Full project structure
+```text
+        concordia/                     <-- project root <br> 
+    ├─ pom.xml                        <-- Maven POM (builds WAR + Swing JAR) <br> 
+    ├─ src/Concordia/                 <-- all Java source files <br> 
+    │   ├─ annotations/               <-- custom backend annotations <br> 
+    │   │   └─ (e.g., Repository.java, Service.java) <br> 
+    │   ├─ controller/                <-- Servlets / REST controllers <br> 
+    │   │   └─ ConcordiaServlet.java <br> 
+    │   ├─ domain/                    <-- domain entities (backend) <br> 
+    │   │   └─ Company.java <br> 
+    │   │   └─ Item.java <br> 
+    │   │   └─ User.java <br> 
+    │   │   └─ History.java <br> 
+    │   ├─ dto/                       <-- DTO classes <br> 
+    │   │   └─ CompanyDto.java <br> 
+    │   │   └─ ItemDto.java <br> 
+    │   │   └─ UserDto.java <br> 
+    │   │   └─ HistoryDto.java <br> 
+    │   ├─ infrastructure/            <-- utility classes, configs <br> 
+    │   │   └─ DBConnection.java <br> 
+    │   │   └─ AppConfig.java <br> 
+    │   ├─ repository/                <-- DAO / database access <br> 
+    │   │   └─ CompanyRepository.java <br> 
+    │   │   └─ ItemRepository.java <br> 
+    │   │   └─ UserRepository.java <br> 
+    │   │   └─ HistoryRepository.java <br> 
+    │   ├─ service/                   <-- business logic <br> 
+    │   │   └─ CompanyService.java <br> 
+    │   │   └─ ItemService.java <br> 
+    │   │   └─ UserService.java <br> 
+    │   │   └─ HistoryService.java <br> 
+    │   ├─ Main.java                  <-- Swing main class (entry point) <br> 
+    │   ├─ MainDriver.java            <-- additional Swing launcher <br> 
+    │   ├─ AdminPanel.java            <-- Swing admin panel <br> 
+    │   ├─ CompanyItemTablePanel.java <-- Swing table panel <br> 
+    │   └─ (any other Swing UI classes) <br> 
+    ├─ webapp/                        <-- web resources for WAR <br> 
+    │   ├─ WEB-INF/ <br> 
+    │   │   └─ web.xml                <-- optional servlet config <br> 
+    │   └─ (static files / JSPs) <br> 
+    ├─ target/                        <-- Maven build output <br> 
+    │   ├─ classes/                   <-- compiled .class files <br> 
+    │   │   └─ Concordia/             <-- package folders reflect src/Concordia <br> 
+    │   ├─ concordia-backend.war      <-- WAR for Jetty deployment <br> 
+    │   └─ concordia-swing.jar        <-- Runnable Swing JAR <br>
+```
 
 Notes
 
@@ -618,7 +767,13 @@ Notes
 
 [Back To Top](#concordia)
 
-## Adding JPA and Hibernate
+### Adding JPA and Hibernate
+
+---
+
+<details>
+    <summary>Details
+    </summary>
 
     Define entity classes for your tables.
     Replace raw JDBC calls in your DAO/repository layer with JPA/Hibernate code:
@@ -790,6 +945,53 @@ Linux/macOS shells can export the same names. If no overrides are provided the v
     ```
 
     This is exactly what Spring normally hides. “JPA with Hibernate, without Spring, done properly.”
+
+<br>
+
+[Back To Top](#concordia)
+
+### ORM Added
+
+---
+
+<details>
+     <summary>Details
+    </summary>
+To refactor your Swing app for JPA/ORM, you need to:
+
+-   Replace all direct JDBC `Connection` usage with JPA's `EntityManager`. - Refactor repository and service classes to use JPA instead of JDBC. - Update the initialization logic (e.g., in InitDatabase) to create an `EntityManagerFactory` and `EntityManager`, and inject them into your repositories/services.
+
+**1. Update InitDatabase.java to use JPA:**
+
+-   Replace `Connection con = DriverManager.getConnection(...)` with JPA setup:
+
+```java
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Persistence;
+
+EntityManagerFactory emf = Persistence.createEntityManagerFactory("test-pu");
+EntityManager em = emf.createEntityManager();
+Databases db = new Databases(em);
+// Use db ORM methods here
+em.close();
+emf.close();
+```
+
+**2. Refactor repositories (CompanyRepository, ItemRepository, HistoryRepository):**
+
+-   Change constructors to accept `EntityManager` instead of `Connection`.
+-   Replace all SQL and JDBC code with JPA queries and entity operations.
+
+**3. Refactor InventoryService and InventoryController:**
+
+-   Update to use the new JPA-based repositories.
+
+**4. Update AdminPanel and other UI classes:**
+
+-   Ensure all data operations go through the refactored controller/service.
+
+</details>
 
 <br>
 
