@@ -93,6 +93,101 @@
             min-height: 96px;
             resize: vertical;
         }
+
+        /* Responsive layout breakpoints */
+        @media (max-width: 425px) {
+            .frame {
+                padding: 8px;
+            }
+
+            .top-panes {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .top-left-pane,
+            .top-right-pane,
+            .bottom-pane {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 426px) and (max-width: 767px) {
+            .frame {
+                padding: 12px;
+            }
+
+            .top-panes {
+                flex-direction: column;
+                gap: 14px;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 991px) {
+            .frame {
+                padding: 16px;
+            }
+
+            .top-panes {
+                flex-direction: row;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+            .top-left-pane,
+            .top-right-pane {
+                flex: 1 1 100%;
+            }
+        }
+
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .frame {
+                padding: 18px;
+            }
+
+            .top-panes {
+                flex-direction: row;
+                gap: 18px;
+            }
+
+            .top-left-pane {
+                flex: 0 0 40%;
+            }
+
+            .top-right-pane {
+                flex: 1;
+            }
+        }
+
+        @media (min-width: 1200px) and (max-width: 1399px) {
+            .frame {
+                padding: 20px;
+            }
+
+            .top-left-pane {
+                flex: 0 0 38%;
+            }
+
+            .top-right-pane {
+                flex: 1;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .frame {
+                padding: 24px;
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .top-left-pane {
+                flex: 0 0 36%;
+            }
+
+            .top-right-pane {
+                flex: 1;
+            }
+        }
     </style>
 
     <title>Gardening Services </title>
