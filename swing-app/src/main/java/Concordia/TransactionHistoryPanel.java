@@ -204,10 +204,12 @@ public class TransactionHistoryPanel extends JPanel {
     public static class MyTableModel extends AbstractTableModel {
         private static final long serialVersionUID = 1L;
         private String[] columnNames = {
-                "Delivery Date",
-                "Location",
-                "Quantity",
-                "Supplier" };
+            "Delivery Date",
+            "Service",
+            "Service Size",
+            "Location",
+            "Amount",
+            "Provider" };
         private List<history> history;
         private Object[][] data;
 
@@ -218,12 +220,14 @@ public class TransactionHistoryPanel extends JPanel {
         public void updateHistory(List<history> history) {
             this.history = (history != null) ? new java.util.ArrayList<>(history) : java.util.Collections.emptyList();
             int listSize = this.history.size();
-            data = new Object[listSize][4];
+            data = new Object[listSize][6];
             for (int i = 0; i < listSize; i++) {
                 data[i][0] = this.history.get(i).getDeliveryDate();
-                data[i][1] = this.history.get(i).getLocation();
-                data[i][2] = this.history.get(i).getAmount();
-                data[i][3] = this.history.get(i).getSupplier();
+ //               data[i][1] = this.history.get(i).getService();
+  //              data[i][2] = this.history.get(i).getServiceSize();
+                data[i][3] = this.history.get(i).getLocation();
+                data[i][4] = this.history.get(i).getAmount();
+                data[i][5] = this.history.get(i).getProvider();
             }
             fireTableDataChanged();
         }
@@ -238,12 +242,14 @@ public class TransactionHistoryPanel extends JPanel {
 
         public Object[][] convertTo2D() {
             int listSize = history.size();
-            final Object[][] data2 = new Object[listSize][4];
+            final Object[][] data2 = new Object[listSize][6];
             for (int i = 0; i < listSize; i++) {
                 data2[i][0] = (Object) history.get(i).getDeliveryDate();
-                data2[i][1] = (Object) history.get(i).getLocation();
-                data2[i][2] = (Object) history.get(i).getAmount();
-                data2[i][3] = (Object) history.get(i).getSupplier();
+   //             data2[i][1] = (Object) history.get(i).getService();
+    //            data2[i][2] = (Object) history.get(i).getServiceSize();
+                data2[i][3] = (Object) history.get(i).getLocation();
+                data2[i][4] = (Object) history.get(i).getAmount();
+                data2[i][5] = (Object) history.get(i).getProvider();
             }
             return data2;
         }

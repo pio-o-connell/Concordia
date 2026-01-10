@@ -79,14 +79,21 @@ public class AdminPanel extends JPanel {
      * Set all main fields in the DetailsPanel.
      * Call this after reading values from the database.
      */
-    public void setFields(String name, String location, String supplier, String delivery, String amount) {
-        System.out.println("[DetailsPanel.setFields] name=" + name + ", location=" + location + ", supplier=" + supplier
-                + ", delivery=" + delivery + ", amount=" + amount);
+    public void setFields(String name, String location, String delivery, String quantity) {
+        System.out.println("[DetailsPanel.setFields] name=" + name + ", location=" + location + ", delivery=" + delivery + ", quantity=" + quantity);
         nameField.setText(name);
         locationField.setText(location);
-        supplierField.setText(supplier);
         deliveryField.setText(delivery);
-        amountField.setText(amount);
+        try {
+            int qty = Integer.parseInt(quantity);
+            if (qty >= 1 && qty <= 5) {
+                quantityCombo.setSelectedItem(qty);
+            } else {
+                quantityCombo.setSelectedItem(1);
+            }
+        } catch (Exception e) {
+            quantityCombo.setSelectedItem(1);
+        }
     }
 
     // Field to display current selected company
@@ -103,22 +110,20 @@ public class AdminPanel extends JPanel {
             setFields(
                 (item != null && item.getItemName() != null) ? item.getItemName() : "",
                 safe(historyEntry.getLocation()),
-                safe(historyEntry.getSupplier()),
                 safe(historyEntry.getDeliveryDate()),
-                String.valueOf(historyEntry.getAmount())
+                ""
             );
             notesArea.setText(safe(historyEntry.getNotes()));
         } else if (item != null) {
             setFields(
                 safe(item.getItemName()),
                 safe(item.getLocation()),
-                "",
                 item.getDate() != null ? item.getDate().toString() : "",
                 String.valueOf(item.getQuantity())
             );
             notesArea.setText(safe(item.getNotes()));
         } else {
-            setFields("", "", "", "", "");
+            setFields("", "", "", "");
             notesArea.setText("");
         }
     }
@@ -127,11 +132,15 @@ public class AdminPanel extends JPanel {
     private EventListenerList listenerList = new EventListenerList();
 
     // new
-    private JTextField nameField = new JTextField("Name", 10);
+    private JTextField nameField = new JTextField("Service Name", 10);
+        // Service Size dropdown
+        private JLabel serviceSizeLabel = new JLabel("Service Size:");
+        private javax.swing.JComboBox<String> serviceSizeCombo = new javax.swing.JComboBox<>(new String[] {"Small", "Medium", "Large", "XL-Large", "XXL-Large"});
     private JTextField locationField = new JTextField("Location", 10);
-    private JTextField supplierField = new JTextField("Supplier", 10);
+    private JLabel providerLabel = new JLabel("Provider:");
+    private javax.swing.JComboBox<String> providerCombo = new javax.swing.JComboBox<>(new String[] {"Provider A", "Provider B", "Provider C"});
     private JTextField deliveryField = new JTextField("Delivery", 10);
-    private JTextField amountField = new JTextField("Amount", 10);
+    private javax.swing.JComboBox<Integer> quantityCombo = new javax.swing.JComboBox<>(new Integer[] {1, 2, 3, 4, 5});
     private JTextArea notesArea = new JTextArea(5, 20); // 5 rows, 20 columns
 
     private JTextField reportDeliveryFrom = new JTextField(8);
@@ -143,9 +152,9 @@ public class AdminPanel extends JPanel {
     private JLabel txCompanyNameLabel = new JLabel("Transaction Company Name:");
     private JLabel currentCompanyLabel = new JLabel("Current Company:");
     private JLabel nameLabel = new JLabel("Service Name:");
-    private JLabel providerNameLabel = new JLabel("Supplier:");
+    private JLabel providerNameLabel = new JLabel("Provider:");
     private JLabel locationLabel = new JLabel("Location:");
-    private JLabel deliveryLabel = new JLabel("Date:");
+    private JLabel deliveryLabel = new JLabel("Delivery Date:");
     private JLabel quantityLabel = new JLabel("Quantity:");
     private JLabel spacerLabel = new JLabel("                ");
 
@@ -194,10 +203,9 @@ public class AdminPanel extends JPanel {
         // Prevent text fields from stretching
         Dimension fieldDim = new Dimension(120, 24);
         nameField.setMaximumSize(fieldDim);
-        supplierField.setMaximumSize(fieldDim);
+        // supplierField removed
         locationField.setMaximumSize(fieldDim);
         deliveryField.setMaximumSize(fieldDim);
-        amountField.setMaximumSize(fieldDim);
         // notesField removed, notesArea used instead
         currentCompanyField.setMaximumSize(fieldDim);
         // Set a fixed preferred size for the panel (adjust as needed)
@@ -210,15 +218,18 @@ public class AdminPanel extends JPanel {
         txCompanyNameLabel.setFont(labelFont);
         currentCompanyLabel.setFont(labelFont);
         nameLabel.setFont(labelFont);
+        serviceSizeLabel.setFont(labelFont);
+        providerLabel.setFont(labelFont);
         providerNameLabel.setFont(labelFont);
         locationLabel.setFont(labelFont);
         deliveryLabel.setFont(labelFont);
         quantityLabel.setFont(labelFont);
         nameField.setFont(fieldFont);
+        serviceSizeCombo.setFont(fieldFont);
+        providerCombo.setFont(fieldFont);
         locationField.setFont(fieldFont);
-        supplierField.setFont(fieldFont);
+        // supplierField removed
         deliveryField.setFont(fieldFont);
-        amountField.setFont(fieldFont);
         notesArea.setFont(fieldFont);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -248,10 +259,44 @@ public class AdminPanel extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(row.apply(currentCompanyLabel, currentCompanyField));
         add(row.apply(nameLabel, nameField));
-        add(row.apply(providerNameLabel, supplierField));
+        // Service Size row
+        JPanel serviceSizeRow = new JPanel(new java.awt.GridLayout(1, 2));
+        serviceSizeLabel.setPreferredSize(new Dimension(halfWidth, rowHeight));
+        serviceSizeLabel.setMaximumSize(new Dimension(halfWidth, rowHeight));
+        serviceSizeCombo.setPreferredSize(new Dimension(halfWidth, rowHeight));
+        serviceSizeCombo.setMaximumSize(new Dimension(halfWidth, rowHeight));
+        serviceSizeRow.add(serviceSizeLabel);
+        serviceSizeRow.add(serviceSizeCombo);
+        serviceSizeRow.setMaximumSize(new Dimension(panelWidth, rowHeight));
+        serviceSizeRow.setPreferredSize(new Dimension(panelWidth, rowHeight));
+        add(serviceSizeRow);
+
+        // Provider row
+        JPanel providerRow = new JPanel(new java.awt.GridLayout(1, 2));
+        providerLabel.setPreferredSize(new Dimension(halfWidth, rowHeight));
+        providerLabel.setMaximumSize(new Dimension(halfWidth, rowHeight));
+        providerCombo.setPreferredSize(new Dimension(halfWidth, rowHeight));
+        providerCombo.setMaximumSize(new Dimension(halfWidth, rowHeight));
+        providerRow.add(providerLabel);
+        providerRow.add(providerCombo);
+        providerRow.setMaximumSize(new Dimension(panelWidth, rowHeight));
+        providerRow.setPreferredSize(new Dimension(panelWidth, rowHeight));
+        add(providerRow);
+
+    // supplierField removed
         add(row.apply(locationLabel, locationField));
         add(row.apply(deliveryLabel, deliveryField));
-        add(row.apply(quantityLabel, amountField));
+        // Quantity row (dropdown)
+        JPanel quantityRow = new JPanel(new java.awt.GridLayout(1, 2));
+        quantityLabel.setPreferredSize(new Dimension(halfWidth, rowHeight));
+        quantityLabel.setMaximumSize(new Dimension(halfWidth, rowHeight));
+        quantityCombo.setPreferredSize(new Dimension(halfWidth, rowHeight));
+        quantityCombo.setMaximumSize(new Dimension(halfWidth, rowHeight));
+        quantityRow.add(quantityLabel);
+        quantityRow.add(quantityCombo);
+        quantityRow.setMaximumSize(new Dimension(panelWidth, rowHeight));
+        quantityRow.setPreferredSize(new Dimension(panelWidth, rowHeight));
+        add(quantityRow);
         // Add Notes label and area on the same horizontal line
         JLabel notesLabel = new JLabel("Notes:");
         notesArea.setLineWrap(true);

@@ -462,8 +462,8 @@ public class CompanyItemTablePanel extends JPanel {
     public static class ItemModel extends AbstractTableModel {
         private static final long serialVersionUID = 1L;
         private String[] columnNames = {
-                "Item Name",
-                "Total(s)"
+                "Service Name",
+                "Service ID"
         };
         @SuppressWarnings("deprecation")
 
@@ -476,7 +476,7 @@ public class CompanyItemTablePanel extends JPanel {
             data = new Object[listSize][2];
             for (int i = 0; i < listSize; i++) {
                 data[i][0] = items.get(i).getItemName();
-                data[i][1] = items.get(i).getQuantity();
+                data[i][1] = items.get(i).getItemId();
             }
         }
 
