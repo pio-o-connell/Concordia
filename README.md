@@ -1,7 +1,7 @@
 # Concordia
 
 Swing app:<br>
-<img src="./documentation/images/Jan08-2026/swing-running.png" alt="Widget" style="width:60%;">
+<img src="./documentation/images/Jan09-2026/swing-app.png" alt="Widget" style="width:60%;">
 
 Servlet: <br>
 <img src="./documentation/images/Jan09-2026/servlet-homePage.png" alt="Servlet" style="width:60%;">
