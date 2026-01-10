@@ -6,6 +6,27 @@ Swing app:<br>
 Servlet: <br>
 <img src="./documentation/images/Jan09-2026/servlet-homePage.png" alt="Servlet" style="width:60%;">
 
+## To run
+
+Open a terminal in your project root:
+C:\Users\pio_o\OneDrive\Documents\updates-to-projects\Concordia
+
+mvn clean install
+
+mvn package -pl swing-app -am
+
+        Runs the Maven "package" phase, which compiles code and creates JAR/WAR files.
+        -pl swing-app tells Maven to build only the swing-app module.
+        -am (also-make) tells Maven to build any modules that swing-app depends on.
+        Result: It packages swing-app and all its required dependencies, but skips unrelated modules.
+
+mvn exec:java -pl swing-app -Dexec.mainClass=concordia.ORMLauncher
+
+cd C:/Users/pio_o/OneDrive/Documents/updates-to-projects/Concordia; mvn -f swing-app/pom.xml '-Dexec.mainClass=concordia.ORMLauncher' exec:java
+
+Simply run servlet by -
+./start-jetty.ps1
+
 ## Overview
 
 ---
