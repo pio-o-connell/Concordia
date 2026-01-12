@@ -1,8 +1,9 @@
 package backend.controller;
 
 import backend.dto.CompanyDto;
-import backend.dto.HistoryDto;
-import backend.dto.ItemDto;
+import backend.dto.TransactionHistoryDto;
+import backend.dto.ServiceTypeDto;
+import backend.dto.ServicePricingDto;
 import backend.dto.UserDto;
 import backend.infrastructure.JpaContext;
 import backend.infrastructure.PersistenceFactory;
@@ -10,9 +11,11 @@ import backend.repository.UserRepository;
 import backend.service.InventoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import concordia.domain.Company;
-import concordia.domain.Item;
+// import concordia.domain.Item; // Removed: Item is obsolete
 import concordia.domain.User;
-import concordia.domain.history;
+import concordia.domain.ServiceType;
+import concordia.domain.ServicePricing;
+import concordia.domain.TransactionHistory;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -54,11 +57,14 @@ public class ConcordiaServlet extends HttpServlet {
             InventoryService inventory = context.inventoryService();
             UserRepository users = context.userRepository();
             switch (type) {
-                case "item":
-                    writeJson(resp, mapItems(inventory.getAllItems()));
+                case "serviceType":
+                    writeJson(resp, mapServiceTypes(inventory.getAllServiceTypes()));
                     break;
-                case "history":
-                    writeJson(resp, mapHistories(inventory.getAllHistory()));
+                case "servicePricing":
+                    writeJson(resp, mapServicePricings(inventory.getAllServicePricings()));
+                    break;
+                case "transactionHistory":
+                    writeJson(resp, mapTransactionHistories(inventory.getAllTransactionHistories()));
                     break;
                 case "company":
                     writeJson(resp, mapCompanies(inventory.getAllCompanies()));
@@ -85,18 +91,38 @@ public class ConcordiaServlet extends HttpServlet {
             InventoryService inventory = context.inventoryService();
             UserRepository users = context.userRepository();
             switch (type) {
-                case "item": {
-                    ItemDto dto = mapper.readValue(req.getInputStream(), ItemDto.class);
-                    inventory.addItem(dto.companyId, dto.quantity, dto.itemName, dto.notes);
+                case "serviceType": {
+                    ServiceTypeDto dto = mapper.readValue(req.getInputStream(), ServiceTypeDto.class);
+                    ServiceType serviceType = new ServiceType();
+                    serviceType.setTypeName(dto.typeName);
+                    inventory.addServiceType(serviceType);
                     resp.setStatus(HttpServletResponse.SC_CREATED);
-                    resp.getWriter().write("Item created");
+                    resp.getWriter().write("ServiceType created");
                     break;
                 }
-                case "history": {
-                    HistoryDto dto = mapper.readValue(req.getInputStream(), HistoryDto.class);
-                    inventory.addHistory(dto.itemId, dto.amount, dto.location, dto.provider, dto.deliveryDate, dto.notes);
+                case "servicePricing": {
+                    ServicePricingDto dto = mapper.readValue(req.getInputStream(), ServicePricingDto.class);
+                    ServicePricing servicePricing = new ServicePricing();
+                    servicePricing.setServiceTypeId(dto.serviceTypeId);
+                    servicePricing.setPrice(dto.price);
+                    servicePricing.setCurrency(dto.currency);
+                    inventory.addServicePricing(servicePricing);
                     resp.setStatus(HttpServletResponse.SC_CREATED);
-                    resp.getWriter().write("History created");
+                    resp.getWriter().write("ServicePricing created");
+                    break;
+                }
+                case "transactionHistory": {
+                    TransactionHistoryDto dto = mapper.readValue(req.getInputStream(), TransactionHistoryDto.class);
+                    TransactionHistory th = new TransactionHistory();
+                    th.setServiceTypeId(dto.serviceTypeId);
+                    th.setAmount(dto.amount);
+                    th.setLocation(dto.location);
+                    th.setProvider(dto.provider);
+                    th.setDeliveryDate(dto.deliveryDate);
+                    th.setNotes(dto.notes);
+                    inventory.addTransactionHistory(th);
+                    resp.setStatus(HttpServletResponse.SC_CREATED);
+                    resp.getWriter().write("TransactionHistory created");
                     break;
                 }
                 case "company": {
@@ -132,18 +158,7 @@ public class ConcordiaServlet extends HttpServlet {
             InventoryService inventory = context.inventoryService();
             UserRepository users = context.userRepository();
             switch (type) {
-                case "item": {
-                    ItemDto dto = mapper.readValue(req.getInputStream(), ItemDto.class);
-                    inventory.updateItem(dto.itemId, dto.companyId, dto.quantity, dto.itemName, dto.notes);
-                    resp.getWriter().write("Item updated");
-                    break;
-                }
-                case "history": {
-                    HistoryDto dto = mapper.readValue(req.getInputStream(), HistoryDto.class);
-                    inventory.updateHistory(dto.historyId, dto.itemId, dto.amount, dto.location, dto.provider, dto.deliveryDate, dto.notes);
-                    resp.getWriter().write("History updated");
-                    break;
-                }
+                // Removed obsolete item/history update cases. Add serviceType/servicePricing/transactionHistory update logic as needed.
                 case "company": {
                     CompanyDto dto = mapper.readValue(req.getInputStream(), CompanyDto.class);
                     Company company = new Company(dto.companyId, "", dto.companyName, new HashSet<>(), new HashSet<>());
@@ -185,14 +200,7 @@ public class ConcordiaServlet extends HttpServlet {
             InventoryService inventory = context.inventoryService();
             UserRepository users = context.userRepository();
             switch (type) {
-                case "item":
-                    inventory.deleteItem(id);
-                    resp.getWriter().write("Item deleted");
-                    break;
-                case "history":
-                    context.historyRepository().deleteHistory(id);
-                    resp.getWriter().write("History deleted");
-                    break;
+                // Removed obsolete item/history delete cases. Add serviceType/servicePricing/transactionHistory delete logic as needed.
                 case "company":
                     context.companyRepository().deleteCompany(id);
                     resp.getWriter().write("Company deleted");
@@ -220,39 +228,52 @@ public class ConcordiaServlet extends HttpServlet {
             CompanyDto dto = new CompanyDto();
             dto.companyId = company.getCompanyId();
             dto.companyName = company.getCompanyName();
-            dto.items = mapItems(company.getItems());
+            // Add mapping for serviceTypes/servicePricings if needed
             dto.users = mapUsers(company.getUsers());
             result.add(dto);
         }
         return result;
     }
 
-    private List<ItemDto> mapItems(Collection<Item> items) {
-        List<ItemDto> result = new ArrayList<>();
-        if (items == null) {
+    private List<ServiceTypeDto> mapServiceTypes(Collection<ServiceType> serviceTypes) {
+        List<ServiceTypeDto> result = new ArrayList<>();
+        if (serviceTypes == null) {
             return result;
         }
-        for (Item item : items) {
-            ItemDto dto = new ItemDto();
-            dto.itemId = item.getItemId();
-            dto.companyId = item.getCompanyId();
-            dto.quantity = item.getQuantity();
-            dto.itemName = item.getItemName();
-            dto.notes = item.getNotes();
+        for (ServiceType service : serviceTypes) {
+            ServiceTypeDto dto = new ServiceTypeDto();
+            dto.serviceTypeId = service.getServiceTypeId();
+            dto.typeName = service.getTypeName();
             result.add(dto);
         }
         return result;
     }
 
-    private List<HistoryDto> mapHistories(Collection<history> histories) {
-        List<HistoryDto> result = new ArrayList<>();
+    private List<ServicePricingDto> mapServicePricings(Collection<ServicePricing> pricings) {
+        List<ServicePricingDto> result = new ArrayList<>();
+        if (pricings == null) {
+            return result;
+        }
+        for (ServicePricing pricing : pricings) {
+            ServicePricingDto dto = new ServicePricingDto();
+            dto.servicePricingId = pricing.getServicePricingId();
+            dto.serviceTypeId = pricing.getServiceTypeId();
+            dto.price = pricing.getPrice();
+            dto.currency = pricing.getCurrency();
+            result.add(dto);
+        }
+        return result;
+    }
+
+    private List<TransactionHistoryDto> mapTransactionHistories(Collection<TransactionHistory> histories) {
+        List<TransactionHistoryDto> result = new ArrayList<>();
         if (histories == null) {
             return result;
         }
-        for (history record : histories) {
-            HistoryDto dto = new HistoryDto();
-            dto.historyId = record.getHistoryId();
-            dto.itemId = record.getItemId();
+        for (TransactionHistory record : histories) {
+            TransactionHistoryDto dto = new TransactionHistoryDto();
+            dto.transactionId = record.getTransactionId();
+            dto.serviceTypeId = record.getServiceTypeId();
             dto.amount = record.getAmount();
             dto.location = record.getLocation();
             dto.provider = record.getProvider();

@@ -5,9 +5,10 @@
   <persistence-unit name="concordiaPU">
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <class>concordia.domain.Company</class>
-    <class>concordia.domain.Item</class>
     <class>concordia.domain.User</class>
-    <class>concordia.domain.history</class>
+    <class>concordia.domain.ServiceType</class>
+    <class>concordia.domain.ServicePricing</class>
+    <class>concordia.domain.TransactionHistory</class>
     <properties>
       <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/concordia"/>
       <property name="jakarta.persistence.jdbc.user" value="postgres"/>

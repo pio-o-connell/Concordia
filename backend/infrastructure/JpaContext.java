@@ -1,8 +1,9 @@
 package backend.infrastructure;
 
 import backend.repository.CompanyRepository;
-import backend.repository.HistoryRepository;
-import backend.repository.ItemRepository;
+import backend.repository.ServiceTypeRepository;
+import backend.repository.ServicePricingRepository;
+import backend.repository.TransactionHistoryRepository;
 import backend.repository.UserRepository;
 import backend.service.InventoryService;
 import jakarta.persistence.EntityManager;
@@ -17,18 +18,20 @@ import jakarta.persistence.EntityManagerFactory;
 public final class JpaContext implements AutoCloseable {
     private final EntityManager entityManager;
     private final CompanyRepository companyRepository;
-    private final ItemRepository itemRepository;
-    private final HistoryRepository historyRepository;
+    private final ServiceTypeRepository serviceTypeRepository;
+    private final ServicePricingRepository servicePricingRepository;
+    private final TransactionHistoryRepository transactionHistoryRepository;
     private final UserRepository userRepository;
     private final InventoryService inventoryService;
 
     private JpaContext(EntityManagerFactory entityManagerFactory) {
         this.entityManager = entityManagerFactory.createEntityManager();
         this.companyRepository = new CompanyRepository(entityManager);
-        this.itemRepository = new ItemRepository(entityManager);
-        this.historyRepository = new HistoryRepository(entityManager);
+        this.serviceTypeRepository = new ServiceTypeRepository(entityManager);
+        this.servicePricingRepository = new ServicePricingRepository(entityManager);
+        this.transactionHistoryRepository = new TransactionHistoryRepository(entityManager);
         this.userRepository = new UserRepository(entityManager);
-        this.inventoryService = new InventoryService(companyRepository, itemRepository, historyRepository);
+        this.inventoryService = new InventoryService(companyRepository, serviceTypeRepository, servicePricingRepository, transactionHistoryRepository);
     }
 
     public static JpaContext open(EntityManagerFactory entityManagerFactory) {
@@ -47,13 +50,8 @@ public final class JpaContext implements AutoCloseable {
         return companyRepository;
     }
 
-    public ItemRepository itemRepository() {
-        return itemRepository;
-    }
+    // Removed itemRepository() as ItemRepository is obsolete.
 
-    public HistoryRepository historyRepository() {
-        return historyRepository;
-    }
 
     @Override
     public void close() {

@@ -30,17 +30,17 @@ public class Item implements Serializable {
 			return itemName;
 		}
 
-		public ArrayList<history> getHistory() {
+		public ArrayList<TransactionHistory> getHistory() {
 			return historyItem;
 		}
 	private int itemId,companyId,quantity,historyId;
 	private String itemName;
 	private String notes; // Notes field
-	private ArrayList<history> historyItem = new ArrayList<history>();
+	private ArrayList<TransactionHistory> historyItem = new ArrayList<TransactionHistory>();
 	Date date = new Date();
 
 	// Updated constructor: removed Location parameter, added Notes
-	public Item(int itemId, int companyId, int quantity, String itemName, String notes, ArrayList<history> historyItem) {
+	public Item(int itemId, int companyId, int quantity, String itemName, String notes, ArrayList<TransactionHistory> historyItem) {
 		this.itemId = itemId;
 		this.companyId = companyId;
 		this.quantity = quantity;

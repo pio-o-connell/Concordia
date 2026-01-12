@@ -6,9 +6,10 @@ import jakarta.persistence.*;
 import java.util.List;
 import java.util.ArrayList;
 import concordia.domain.Company;
-import concordia.domain.Item;
+import concordia.domain.ServiceType;
+import concordia.domain.ServicePricing;
+import concordia.domain.TransactionHistory;
 import concordia.domain.User;
-import concordia.domain.history;
 
 public class Databases {
     @PersistenceContext
@@ -26,15 +27,15 @@ public class Databases {
         entityManager.getTransaction().commit();
     }
 
-    // Update a history record using JPA
-    public void updateHistory(int historyId, String location, String supplier, String delivery, int quantity, String notes) {
+    // Update a transaction history record using JPA
+    public void updateTransactionHistory(int historyId, String location, String provider, String deliveryDate, int amount, String notes) {
         entityManager.getTransaction().begin();
-        history hist = entityManager.find(history.class, historyId);
+        TransactionHistory hist = entityManager.find(TransactionHistory.class, historyId);
         if (hist != null) {
             hist.setLocation(location);
-            hist.setSupplier(supplier);
-            hist.setDeliveryDate(delivery);
-            hist.setAmount(quantity);
+            hist.setProvider(provider);
+            hist.setDeliveryDate(deliveryDate);
+            hist.setAmount(amount);
             hist.setNotes(notes);
             entityManager.merge(hist);
         }
@@ -56,5 +57,73 @@ public class Databases {
         entityManager.getTransaction().commit();
     }
 
-    // Add more methods as needed, following this pattern for JPA usage
+    // Insert a new service type
+    public void insertServiceType(String typeName) {
+        ServiceType serviceType = new ServiceType();
+        serviceType.setTypeName(typeName);
+        entityManager.getTransaction().begin();
+        entityManager.persist(serviceType);
+        entityManager.getTransaction().commit();
+    }
+
+    // Insert a new service pricing
+    public void insertServicePricing(int serviceTypeId, double price, String currency) {
+        ServiceType serviceType = entityManager.find(ServiceType.class, serviceTypeId);
+        if (serviceType != null) {
+            ServicePricing pricing = new ServicePricing();
+            pricing.setServiceType(serviceType);
+            pricing.setPrice(price);
+            pricing.setCurrency(currency);
+            entityManager.getTransaction().begin();
+            entityManager.persist(pricing);
+            entityManager.getTransaction().commit();
+        }
+    }
+
+    // Insert a new transaction history
+    public void insertTransactionHistory(int serviceTypeId, int amount, String location, String provider, String deliveryDate, String notes) {
+        ServiceType serviceType = entityManager.find(ServiceType.class, serviceTypeId);
+        if (serviceType != null) {
+            TransactionHistory history = new TransactionHistory();
+            history.setServiceType(serviceType);
+            history.setAmount(amount);
+            history.setLocation(location);
+            history.setProvider(provider);
+            history.setDeliveryDate(deliveryDate);
+            history.setNotes(notes);
+            entityManager.getTransaction().begin();
+            entityManager.persist(history);
+            entityManager.getTransaction().commit();
+        }
+    }
+
+    // Get all service types
+    public List<ServiceType> getAllServiceTypes() {
+        return entityManager.createQuery("SELECT s FROM ServiceType s", ServiceType.class).getResultList();
+    }
+
+    // Get all transaction histories
+    public List<TransactionHistory> getAllTransactionHistories() {
+        return entityManager.createQuery("SELECT t FROM TransactionHistory t", TransactionHistory.class).getResultList();
+    }
+
+    // Delete a service type
+    public void deleteServiceType(int serviceTypeId) {
+        entityManager.getTransaction().begin();
+        ServiceType serviceType = entityManager.find(ServiceType.class, serviceTypeId);
+        if (serviceType != null) {
+            entityManager.remove(serviceType);
+        }
+        entityManager.getTransaction().commit();
+    }
+
+    // Delete a transaction history
+    public void deleteTransactionHistory(int historyId) {
+        entityManager.getTransaction().begin();
+        TransactionHistory history = entityManager.find(TransactionHistory.class, historyId);
+        if (history != null) {
+            entityManager.remove(history);
+        }
+        entityManager.getTransaction().commit();
+    }
 }

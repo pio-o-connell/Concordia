@@ -71,8 +71,9 @@ import javax.swing.BoxLayout;
 /*-------------------------------------------------------------------------------------------------------------------*/
 import concordia.controller.InventoryController;
 import concordia.domain.Company;
-import concordia.domain.Item;
-import concordia.domain.history;
+import concordia.domain.ServiceType;
+import concordia.domain.ServicePricing;
+import concordia.domain.TransactionHistory;
 
 public class AdminPanel extends JPanel {
     /**
@@ -104,24 +105,24 @@ public class AdminPanel extends JPanel {
         currentCompanyField.setText(name);
     }
 
-    public void displaySelection(Company company, Item item, history historyEntry) {
+    public void displaySelection(Company company, ServiceType serviceType, TransactionHistory historyEntry) {
         setCurrentCompanyField(company != null ? company.getCompanyName() : "");
         if (historyEntry != null) {
             setFields(
-                (item != null && item.getItemName() != null) ? item.getItemName() : "",
+                (serviceType != null && serviceType.getTypeName() != null) ? serviceType.getTypeName() : "",
                 safe(historyEntry.getLocation()),
                 safe(historyEntry.getDeliveryDate()),
-                ""
+                String.valueOf(historyEntry.getAmount())
             );
             notesArea.setText(safe(historyEntry.getNotes()));
-        } else if (item != null) {
+        } else if (serviceType != null) {
             setFields(
-                safe(item.getItemName()),
-                safe(item.getLocation()),
-                item.getDate() != null ? item.getDate().toString() : "",
-                String.valueOf(item.getQuantity())
+                safe(serviceType.getTypeName()),
+                "",
+                "",
+                ""
             );
-            notesArea.setText(safe(item.getNotes()));
+            notesArea.setText("");
         } else {
             setFields("", "", "", "");
             notesArea.setText("");
@@ -177,20 +178,34 @@ public class AdminPanel extends JPanel {
         // Add button action listeners to call controller methods
         addBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Example: call controller to add item/history
-                // controller.addItem(...); // Fill with actual parameters from fields
+                // Example: call controller to add a new service type or transaction history
+                String serviceTypeName = nameField.getText();
+                String location = locationField.getText();
+                String provider = (String) providerCombo.getSelectedItem();
+                String deliveryDate = deliveryField.getText();
+                int amount = (Integer) quantityCombo.getSelectedItem();
+                String notes = notesArea.getText();
+                // Add a new service type if only name is provided
+                if (!serviceTypeName.isEmpty() && location.isEmpty() && provider.isEmpty() && deliveryDate.isEmpty()) {
+                    controller.addServiceType(serviceTypeName);
+                } else if (!serviceTypeName.isEmpty() && !location.isEmpty() && !provider.isEmpty() && !deliveryDate.isEmpty()) {
+                    // Add a new transaction history
+                    // You may need to select a serviceTypeId based on UI selection
+                    int serviceTypeId = 1; // TODO: get selected serviceTypeId from UI
+                    controller.addTransactionHistory(serviceTypeId, amount, location, provider, deliveryDate, notes);
+                }
             }
         });
         updateBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Example: call controller to update item/history
-                // controller.updateHistory(...); // Fill with actual parameters from fields
+                // Example: call controller to update transaction history
+                // TODO: get selected TransactionHistory from UI and update
             }
         });
         removeBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Example: call controller to delete item/history
-                // controller.deleteItem(...); // Fill with actual parameters from fields
+                // Example: call controller to delete transaction history
+                // TODO: get selected TransactionHistory from UI and delete
             }
         });
         this.controller = controller;

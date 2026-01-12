@@ -3,56 +3,70 @@ package concordia.service;
 import concordia.annotations.Service;
 
 import concordia.repository.CompanyRepository;
-import concordia.repository.ItemRepository;
-import concordia.repository.HistoryRepository;
+import concordia.repository.ServiceRepository;
+import concordia.repository.TransactionHistoryRepository;
 import concordia.domain.Company;
-import concordia.domain.Item;
-import concordia.domain.history;
+import concordia.domain.ServiceType;
+import concordia.domain.ServicePricing;
+import concordia.domain.TransactionHistory;
 import java.util.List;
 
 @Service
 public class InventoryService {
     private final CompanyRepository companyRepo;
-    private final ItemRepository itemRepo;
-    private final HistoryRepository historyRepo;
-    public InventoryService(CompanyRepository companyRepo, ItemRepository itemRepo, HistoryRepository historyRepo) {
+    private final ServiceRepository serviceRepo;
+    private final TransactionHistoryRepository historyRepo;
+    public InventoryService(CompanyRepository companyRepo, ServiceRepository serviceRepo, TransactionHistoryRepository historyRepo) {
         this.companyRepo = companyRepo;
-        this.itemRepo = itemRepo;
+        this.serviceRepo = serviceRepo;
         this.historyRepo = historyRepo;
     }
 
-    // Retrieve all items
-    public List<Item> getAllItems() {
-        return itemRepo.getAllItems();
+    // Retrieve all service types
+    public List<ServiceType> getAllServiceTypes() {
+        return serviceRepo.getAllServiceTypes();
     }
 
-    // Retrieve all history records
-    public List<history> getAllHistory() {
-        return historyRepo.getAllHistory();
+    // Retrieve all service pricing
+    public List<ServicePricing> getAllServicePricings() {
+        return serviceRepo.getAllServicePricings();
+    }
+
+    // Retrieve all transaction history records
+    public List<TransactionHistory> getAllTransactionHistory() {
+        return historyRepo.getAllTransactionHistory();
     }
 
     // Example thin delegation methods
     public List<Company> getAllCompanies() {
-        return companyRepo.loadCompaniesWithItemsAndUsers();
+        return companyRepo.loadCompaniesWithUsers();
     }
 
-    public void addItem(int companyId, int amount, String itemName, String notes) {
-        itemRepo.insertNewItem(companyId, amount, itemName, notes);
+    public void addServiceType(String typeName) {
+        serviceRepo.insertNewServiceType(typeName);
     }
 
-    public void deleteItem(int itemId) {
-        itemRepo.deleteItem(itemId);
+    public void addServicePricing(int serviceTypeId, double price, String currency, String effectiveDate) {
+        serviceRepo.insertNewServicePricing(serviceTypeId, price, currency, effectiveDate);
     }
 
-    public void addHistory(int itemId, int amount, String location, String provider, String deliveryDate, String notes) {
-        historyRepo.insertHistory(itemId, amount, location, provider, deliveryDate, notes);
+    public void deleteServiceType(int serviceTypeId) {
+        serviceRepo.deleteServiceType(serviceTypeId);
     }
 
-    public void updateHistory(history hist) {
-        historyRepo.updateHistory(hist);
+    public void deleteServicePricing(int servicePricingId) {
+        serviceRepo.deleteServicePricing(servicePricingId);
     }
 
-    public void deleteHistory(int historyId) {
-        historyRepo.deleteHistory(historyId);
+    public void addTransactionHistory(int serviceTypeId, int amount, String location, String provider, String deliveryDate, String notes) {
+        historyRepo.insertTransactionHistory(serviceTypeId, amount, location, provider, deliveryDate, notes);
+    }
+
+    public void updateTransactionHistory(TransactionHistory hist) {
+        historyRepo.updateTransactionHistory(hist);
+    }
+
+    public void deleteTransactionHistory(int transactionId) {
+        historyRepo.deleteTransactionHistory(transactionId);
     }
 }

@@ -13,6 +13,16 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "users")
 public class User implements Serializable{
+			public User(int userId, int companyId, String username, String password) {
+				this.userId = userId;
+				this.username = username;
+				this.password = password;
+				this.company = new Company();
+				this.company.setCompanyId(companyId);
+			}
+		public int getCompanyId() {
+			return company != null ? company.getCompanyId() : 0;
+		}
 	@Id
 	@Column(name = "user_id")
 	private int userId;
@@ -27,8 +37,6 @@ public class User implements Serializable{
 	@JoinColumn(name = "company_id", nullable = false)
 	private Company company;
 
-	// Added for legacy compatibility
-	private int companyId;
 
 	public Company getCompany() {
 		return company;
@@ -47,12 +55,6 @@ public class User implements Serializable{
 
 	public User() {}
 
-	public User(int userId,int companyId,String username,String password){
-		this.userId = userId;
-		this.companyId = companyId;
-		this.username = username;
-		this.password = password;
-	}
 
 	public void ListUsers(){
 		// ...
@@ -74,13 +76,6 @@ public class User implements Serializable{
 		this.userId = userId;
 	}
 
-	public int getCompanyId() {
-		return companyId;
-	}
-
-	public void setCompanyId(int companyId) {
-		this.companyId = companyId;
-	}
 
 	public String getPassword() {
 		return password;

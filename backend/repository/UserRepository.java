@@ -27,7 +27,6 @@ public class UserRepository {
             User user = new User();
             user.setUserId(userId);
             user.setCompany(company);
-            user.setCompanyId(companyId);
             user.setUsername(username);
             user.setPassword(password);
             entityManager.persist(user);

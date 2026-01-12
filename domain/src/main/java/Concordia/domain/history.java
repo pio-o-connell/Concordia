@@ -7,7 +7,7 @@ import java.util.Date;
  * The 'History class holds all the historical data associated with past transactions 
  * for particular item being stocked by particular manufacturer and said suppliers.
  ---------------------------------------------------------------------------------------*/
-public class history implements Serializable{
+public class TransactionHistory implements Serializable{
 		public String getSupplier() {
 			return provider;
 		}
@@ -21,7 +21,7 @@ public class history implements Serializable{
 	private String deliveryDate;
 	private String notes; // Notes field
 
-	public history(int historyId, int itemId, int amount, String location, String provider, String deliveryDate, String notes) {
+	public TransactionHistory(int historyId, int itemId, int amount, String location, String provider, String deliveryDate, String notes) {
 		this.historyId = historyId;
 		this.itemId = itemId;
 		this.amount = amount;
@@ -38,7 +38,7 @@ public class history implements Serializable{
 		this.notes = notes;
 	}
 
-	public history(){
+	public TransactionHistory(){
 	}
 
 	public int getHistoryId() {

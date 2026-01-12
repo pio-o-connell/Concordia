@@ -1,57 +1,79 @@
 package backend.service;
 
 import backend.repository.CompanyRepository;
-import backend.repository.HistoryRepository;
-import backend.repository.ItemRepository;
+import backend.repository.ServiceTypeRepository;
+import backend.repository.ServicePricingRepository;
+import backend.repository.TransactionHistoryRepository;
 import concordia.domain.Company;
-import concordia.domain.Item;
-import concordia.domain.history;
+import concordia.domain.ServiceType;
+import concordia.domain.ServicePricing;
+import concordia.domain.TransactionHistory;
 import java.util.List;
 
 public class InventoryService {
     private final CompanyRepository companyRepository;
-    private final ItemRepository itemRepository;
-    private final HistoryRepository historyRepository;
+    private final ServiceTypeRepository serviceTypeRepository;
+    private final ServicePricingRepository servicePricingRepository;
+    private final TransactionHistoryRepository transactionHistoryRepository;
 
-    public InventoryService(CompanyRepository companyRepository, ItemRepository itemRepository, HistoryRepository historyRepository) {
+    public InventoryService(CompanyRepository companyRepository, ServiceTypeRepository serviceTypeRepository, ServicePricingRepository servicePricingRepository, TransactionHistoryRepository transactionHistoryRepository) {
         this.companyRepository = companyRepository;
-        this.itemRepository = itemRepository;
-        this.historyRepository = historyRepository;
+        this.serviceTypeRepository = serviceTypeRepository;
+        this.servicePricingRepository = servicePricingRepository;
+        this.transactionHistoryRepository = transactionHistoryRepository;
     }
 
-    public List<Item> getAllItems() {
-        return itemRepository.getAllItems();
+    public List<ServiceType> getAllServiceTypes() {
+        return serviceTypeRepository.getAllServiceTypes();
     }
 
-    public List<history> getAllHistory() {
-        return historyRepository.getAllHistory();
+    public List<ServicePricing> getAllServicePricings() {
+        return servicePricingRepository.getAllServicePricings();
+    }
+
+    public List<TransactionHistory> getAllTransactionHistories() {
+        return transactionHistoryRepository.getAllTransactionHistories();
     }
 
     public List<Company> getAllCompanies() {
         return companyRepository.getAllCompanies();
     }
 
-    public void addItem(int companyId, int amount, String itemName, String notes) {
-        itemRepository.insertNewItem(companyId, amount, itemName, notes);
+    public void addServiceType(ServiceType serviceType) {
+        serviceTypeRepository.insertServiceType(serviceType);
     }
 
-    public void deleteItem(int itemId) {
-        itemRepository.deleteItem(itemId);
+    public void addServicePricing(ServicePricing servicePricing) {
+        servicePricingRepository.insertServicePricing(servicePricing);
     }
 
-    public void updateItem(int itemId, int companyId, int amount, String itemName, String notes) {
-        itemRepository.updateItem(itemId, companyId, amount, itemName, notes);
+    public void addTransactionHistory(TransactionHistory transactionHistory) {
+        transactionHistoryRepository.insertTransactionHistory(transactionHistory);
     }
 
-    public void addHistory(int itemId, int amount, String location, String provider, String deliveryDate, String notes) {
-        historyRepository.insertHistory(itemId, amount, location, provider, deliveryDate, notes);
+
+
+    public void updateServiceType(ServiceType serviceType) {
+        serviceTypeRepository.updateServiceType(serviceType);
     }
 
-    public void updateHistory(int historyId, int itemId, int amount, String location, String provider, String deliveryDate, String notes) {
-        historyRepository.updateHistory(historyId, itemId, amount, location, provider, deliveryDate, notes);
+    public void updateServicePricing(ServicePricing servicePricing) {
+        servicePricingRepository.updateServicePricing(servicePricing);
     }
 
-    public void deleteHistory(int historyId) {
-        historyRepository.deleteHistory(historyId);
+    public void updateTransactionHistory(TransactionHistory transactionHistory) {
+        transactionHistoryRepository.updateTransactionHistory(transactionHistory);
+    }
+
+    public void deleteServiceType(int serviceTypeId) {
+        serviceTypeRepository.deleteServiceType(serviceTypeId);
+    }
+
+    public void deleteServicePricing(int pricingId) {
+        servicePricingRepository.deleteServicePricing(pricingId);
+    }
+
+    public void deleteTransactionHistory(int transactionId) {
+        transactionHistoryRepository.deleteTransactionHistory(transactionId);
     }
 }

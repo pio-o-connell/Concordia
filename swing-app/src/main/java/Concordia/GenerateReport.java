@@ -17,9 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import concordia.domain.Company;
-import concordia.domain.Item;
 import concordia.domain.User;
-import concordia.domain.history;
+// Removed obsolete Item/history imports
 // import concordia.domain.Index; // Removed: Index class does not exist
 import java.util.Date;
 
@@ -42,20 +41,7 @@ public class GenerateReport {
             outputStream.println("Date"+date.toString());
             outputStream.print("Company Name: "+companyList.get(i).getCompanyName());
             outputStream.println("\tCompany Id: "+companyList.get(i).getCompanyId());
-            for(int j=0;j<companyList.get(i).getItems().size();j++){
-                java.util.Set<concordia.domain.Item> itemSet = companyList.get(i).getItems();
-                java.util.List<concordia.domain.Item> itemList = new java.util.ArrayList<>(itemSet);
-                if (j >= itemList.size()) continue;
-                concordia.domain.Item item = itemList.get(j);
-                outputStream.println("Item Name: \t\t\tItem Id: \t\t Item Quantity: \t\tItem Location: ");
-                outputStream.println(item.getItemName()+"\t\t\t " +item.getItemId()+"\t\t\t" +item.getQuantity());
-                outputStream.println("\t\t\tHistory Location: \t\t\tHistoryId:  \t\t Amount: \t\tSupplier: \t\tDelivery Date: ");
-                java.util.List<concordia.domain.history> historyList = item.getHistory();
-                for(int k=0;k<historyList.size();k++){
-                    concordia.domain.history history = historyList.get(k);
-                    outputStream.println("\t\t\t "+ history.getLocation()+"\t\t\t "+ history.getHistoryId()+"\t\t"+history.getAmount()+"\t\t  "+ history.getSupplier()+"\t\t "+history.getDeliveryDate());
-                }
-            }
+            // No longer reporting on Item/history. Add ServiceType/TransactionHistory reporting as needed.
         }
         out.close();
     }

@@ -3,7 +3,9 @@ package concordia.controller;
 import concordia.annotations.Controller;
 import concordia.service.InventoryService;
 import concordia.domain.Company;
-import concordia.domain.history;
+import concordia.domain.ServiceType;
+import concordia.domain.ServicePricing;
+import concordia.domain.TransactionHistory;
 import java.util.List;
 
 @Controller
@@ -13,43 +15,50 @@ public class InventoryController {
         this.service = service;
     }
 
-    // Retrieve notes for an item by row index
-    public String getItemNotesForRow(int row) {
-        List<concordia.domain.Item> allItems = service.getAllItems();
-        if (row >= 0 && row < allItems.size()) {
-            return allItems.get(row).getNotes();
-        }
-        return null;
+    // Retrieve all service types
+    public List<ServiceType> getAllServiceTypes() {
+        return service.getAllServiceTypes();
     }
 
-    // Retrieve notes for a history record by row index
-    public String getHistoryNotesForRow(int row) {
-        List<history> allHistory = service.getAllHistory();
-        if (row >= 0 && row < allHistory.size()) {
-            return allHistory.get(row).getNotes();
-        }
-        return null;
+    // Retrieve all service pricing
+    public List<ServicePricing> getAllServicePricings() {
+        return service.getAllServicePricings();
+    }
+
+    // Retrieve all transaction history
+    public List<TransactionHistory> getAllTransactionHistory() {
+        return service.getAllTransactionHistory();
     }
 
     public List<Company> getAllCompanies() {
         return service.getAllCompanies();
     }
-    public void addItem(int companyId, int amount, String itemName, String notes) {
-        service.addItem(companyId, amount, itemName, notes);
+
+    public void addServiceType(String typeName) {
+        service.addServiceType(typeName);
     }
-    public void deleteItem(int itemId) {
-        service.deleteItem(itemId);
+
+    public void addServicePricing(int serviceTypeId, double price, String currency, String effectiveDate) {
+        service.addServicePricing(serviceTypeId, price, currency, effectiveDate);
     }
-        public java.util.List<concordia.domain.history> getAllHistory() {
-            return service.getAllHistory();
-        }
-    public void addHistory(int itemId, int amount, String location, String provider, String deliveryDate, String notes) {
-        service.addHistory(itemId, amount, location, provider, deliveryDate, notes);
+
+    public void deleteServiceType(int serviceTypeId) {
+        service.deleteServiceType(serviceTypeId);
     }
-    public void updateHistory(history hist) {
-        service.updateHistory(hist);
+
+    public void deleteServicePricing(int servicePricingId) {
+        service.deleteServicePricing(servicePricingId);
     }
-    public void deleteHistory(int historyId) {
-        service.deleteHistory(historyId);
+
+    public void addTransactionHistory(int serviceTypeId, int amount, String location, String provider, String deliveryDate, String notes) {
+        service.addTransactionHistory(serviceTypeId, amount, location, provider, deliveryDate, notes);
+    }
+
+    public void updateTransactionHistory(TransactionHistory hist) {
+        service.updateTransactionHistory(hist);
+    }
+
+    public void deleteTransactionHistory(int transactionId) {
+        service.deleteTransactionHistory(transactionId);
     }
 }

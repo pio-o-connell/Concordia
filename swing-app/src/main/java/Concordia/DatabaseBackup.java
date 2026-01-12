@@ -19,9 +19,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import concordia.domain.Company;
-import concordia.domain.Item;
 import concordia.domain.User;
-import concordia.domain.history;
+// Removed obsolete Item/history imports
 
 //import com.mysql.jdbc.Connection;
 //import com.mysql.jdbc.PreparedStatement;
@@ -31,8 +30,7 @@ import concordia.annotations.Configuration;
 public class DatabaseBackup {
 
     Connection con;
-    List<history> history11 = new java.util.ArrayList<>();
-    ArrayList<Item> Item11 = new ArrayList<Item>();
+    // Removed obsolete Item/history fields
     ArrayList<User> User11 = new ArrayList<User>();
 
     DatabaseBackup(Connection con) throws Exception {
@@ -43,9 +41,9 @@ public class DatabaseBackup {
 
     public void backup(Connection con1, ArrayList<Company> companies) throws SQLException {
         this.con = con1;
+        PreparedStatement statement = null;
         try {
-
-            PreparedStatement statement = (PreparedStatement) con.prepareStatement("DROP DATABASE if exists BackupConcordia");
+            statement = (PreparedStatement) con.prepareStatement("DROP DATABASE if exists BackupConcordia");
             statement.executeUpdate();
 
             statement = (PreparedStatement) con.prepareStatement("CREATE DATABASE BackupConcordia");
@@ -54,85 +52,61 @@ public class DatabaseBackup {
             statement = (PreparedStatement) con.prepareStatement("USE BackupConcordia");
             statement.executeUpdate();
 
-            String query = "CREATE TABLE Company("
-                    + "Company_ID INT NOT NULL,"
-                    + "Company_title CHAR(25) NULL,"
-                    + "PRIMARY KEY(Company_ID)"
-                    + ")"
-                    + "ENGINE = InnoDB  ";
+            // Create new tables for ServiceType, ServicePricing, TransactionHistory as per new schema
+            String query = "CREATE TABLE Company(" +
+                "Company_ID INT NOT NULL," +
+                "Company_title CHAR(25) NULL," +
+                "PRIMARY KEY(Company_ID)" +
+                ") ENGINE = InnoDB";
             statement = (PreparedStatement) con.prepareStatement(query);
             statement.executeUpdate();
 
-                statement = (PreparedStatement) con.prepareStatement(
-                    "ALTER TABLE Item ADD UNIQUE KEY uq_item_id (Item_ID)"
-                );
-                statement.executeUpdate();
-
-            query = " CREATE TABLE Users("
-                    + "User_ID INT NOT NULL,"
-                    + "User_Name CHAR(25) NULL,"
-                    + "User_Password CHAR(25) NOT NULL,"
-                    + "Company_ID INT NOT NULL,"
-                    + "PRIMARY KEY(User_ID),"
-                    + "CONSTRAINT fk_companies1 FOREIGN KEY(Company_ID)"
-                    + "REFERENCES Company(Company_ID)"
-                    + " )"
-                    + " ENGINE = InnoDB";
+            query = "CREATE TABLE Users(" +
+                "User_ID INT NOT NULL," +
+                "User_Name CHAR(25) NULL," +
+                "User_Password CHAR(25) NOT NULL," +
+                "Company_ID INT NOT NULL," +
+                "PRIMARY KEY(User_ID)," +
+                "CONSTRAINT fk_companies1 FOREIGN KEY(Company_ID) REFERENCES Company(Company_ID)" +
+                ") ENGINE = InnoDB";
             statement = (PreparedStatement) con.prepareStatement(query);
             statement.executeUpdate();
 
-            query = "CREATE TABLE Item("
-                    + "Item_ID INT NOT NULL AUTO_INCREMENT,"
-                    + "Company_ID INT NOT NULL,"
-                    + "quantity INT NULL,"
-                    + "itemName CHAR(25) NULL,"
-                    + "PRIMARY KEY(Item_ID)," 
-                    + "CONSTRAINT fk_companies FOREIGN KEY(Company_ID)"
-                    + "REFERENCES Company(Company_ID)"
-                    + ")"
-                    + "ENGINE = InnoDB";
+            query = "CREATE TABLE ServiceType(" +
+                "service_type_id INT NOT NULL AUTO_INCREMENT," +
+                "type_name CHAR(50) NOT NULL," +
+                "PRIMARY KEY(service_type_id)" +
+                ") ENGINE = InnoDB";
             statement = (PreparedStatement) con.prepareStatement(query);
             statement.executeUpdate();
 
-            query = "CREATE TABLE History("
-                    + "history_id INT NOT NULL AUTO_INCREMENT,"
-                    + "item_ID INT NOT NULL,"
-                    + "amount INT NULL,"
-                    + "location CHAR(25) NULL,"
-                    + "Supplier CHAR(25) NULL,"
-                    + "Delivery_Date DATE NULL,"
-                    + "PRIMARY KEY(history_id,item_ID),"
-                    + "CONSTRAINT fk_items FOREIGN KEY(item_ID) "
-                    + "REFERENCES Item(Item_ID)"
-                    + ")"
-                    + "ENGINE = InnoDB ";
-
+            query = "CREATE TABLE ServicePricing(" +
+                "service_pricing_id INT NOT NULL AUTO_INCREMENT," +
+                "service_type_id INT NOT NULL," +
+                "price DOUBLE NOT NULL," +
+                "PRIMARY KEY(service_pricing_id)," +
+                "CONSTRAINT fk_service_type FOREIGN KEY(service_type_id) REFERENCES ServiceType(service_type_id)" +
+                ") ENGINE = InnoDB";
             statement = (PreparedStatement) con.prepareStatement(query);
             statement.executeUpdate();
 
-            // for Company		
+            query = "CREATE TABLE TransactionHistory(" +
+                "transaction_history_id INT NOT NULL AUTO_INCREMENT," +
+                "service_type_id INT NOT NULL," +
+                "amount INT NULL," +
+                "location CHAR(50) NULL," +
+                "provider CHAR(50) NULL," +
+                "delivery_date CHAR(25) NULL," +
+                "notes TEXT NULL," +
+                "PRIMARY KEY(transaction_history_id)," +
+                "CONSTRAINT fk_service_type_th FOREIGN KEY(service_type_id) REFERENCES ServiceType(service_type_id)" +
+                ") ENGINE = InnoDB";
+            statement = (PreparedStatement) con.prepareStatement(query);
+            statement.executeUpdate();
+
+            // for Company
             System.out.println(companies.get(0).getCompanyId());
             System.out.println("Sizeof Company Array" + companies.size());
-
-            // Convert Set to List for items
-            java.util.Set<concordia.domain.Item> itemSet0 = companies.get(0).getItems();
-            java.util.List<concordia.domain.Item> itemList0 = new java.util.ArrayList<>(itemSet0);
-            System.out.println(itemList0.isEmpty() ? "No items" : itemList0.get(0).getItemName());
-            System.out.println("Sizeof items array" + itemList0.size());
-
-            // Convert Set to List for history
-            java.util.List<concordia.domain.history> historyList0 = itemList0.isEmpty() ? new java.util.ArrayList<>() : itemList0.get(0).getHistory();
-            System.out.println(historyList0.isEmpty() ? "No history" : historyList0.get(0).getLocation());
-            System.out.println("Sizeof history array" + historyList0.size());
-
-            java.util.List<concordia.domain.history> historyList1 = itemList0.size() > 1 ? itemList0.get(1).getHistory() : new java.util.ArrayList<>();
-            System.out.println("Sizeof history array" + historyList1.size());
-            System.out.println(historyList1.isEmpty() ? "No historyId" : historyList1.get(0).getHistoryId());
-
-            // Convert Set to List for users
-            java.util.Set<concordia.domain.User> userSet = companies.get(0).getUsers();
-            java.util.List<concordia.domain.User> userList = new java.util.ArrayList<>(userSet);
-            System.out.println(userList.isEmpty() ? "No users" : userList.get(0).getPassword());
 
             // backup the data to the backup
             for (int i = 0; i < companies.size(); i++) { // will be only one company here
@@ -140,48 +114,27 @@ public class DatabaseBackup {
                 statement.setInt(1, companies.get(i).getCompanyId());
                 statement.setString(2, companies.get(i).getCompanyName());
                 statement.executeUpdate();
-                java.util.Set<concordia.domain.Item> itemSet = companies.get(i).getItems();
-                java.util.List<concordia.domain.Item> itemList = new java.util.ArrayList<>(itemSet);
-                for (int j = 0; j < itemList.size(); j++) {
-                    concordia.domain.Item item = itemList.get(j);
-                    statement = (PreparedStatement) con.prepareStatement("INSERT INTO ITEM(ITEM_ID,COMPANY_ID,QUANTITY,ITEMNAME)  VALUES  (?,?,?,?)");
-                    // statement.setInt(1, item.getItemId()); // TODO: Implement getItemId() or update logic
-                    statement.setInt(2, companies.get(i).getCompanyId());
-                    statement.setInt(3, item.getQuantity());
-                    statement.setString(4, item.getItemName());
+                // backup users if needed
+                /* for (User user : companies.get(i).getUsers()) {
+                    statement = (PreparedStatement) con.prepareStatement("INSERT INTO Users(USER_ID,USER_NAME,USER_PASSWORD,COMPANY_ID)  VALUES  (?,?,?,?)");
+                    statement.setInt(1, user.getUserId());
+                    statement.setString(2, user.getUsername());
+                    statement.setString(3, user.getPassword());
+                    statement.setInt(4, companies.get(i).getCompanyId());
                     statement.executeUpdate();
-
-                    java.util.List<concordia.domain.history> historyList = item.getHistory();
-                    for (int k = 0; k < historyList.size(); k++) {
-                        concordia.domain.history history = historyList.get(k);
-                        statement = (PreparedStatement) con.prepareStatement("INSERT  INTO  history(HISTORY_ID,ITEM_id,AMOUNT,LOCATION,Supplier,DELIVERY_DATE)  VALUES  (?,?,?,?,?,?)");
-                        statement.setInt(1, history.getHistoryId());
-                        // statement.setInt(2, item.getItemId()); // TODO: Implement getItemId() or update logic
-                        statement.setInt(3, history.getAmount());
-                        statement.setString(4, history.getLocation());
-                        statement.setString(5, history.getSupplier());
-                        statement.setString(6, history.getDeliveryDate());
-                        statement.executeUpdate();
-                    }
-
-                    //backup the users
-                    /*	for(int l=0;l<companies.get(i).getUsers().size();l++){
-				    statement = (PreparedStatement) con.prepareStatement("INSERT INTO USERs(USER_ID,USER_NAME,USER_PASSWORD,COMPANY_ID)  VALUES  (?,?,?,?)"); 
-			    	statement.setInt(1, companies.get(i).getUsers().get(l).getUserId());
-			    	statement.setString(2, companies.get(i).getUsers().get(l).getUsername());
-			    	statement.setString(3, companies.get(i).getUsers().get(l).getPassword());
-			    	statement.setInt(4, companies.get(i).getUsers().get(l).getCompanyId());
-			    	statement.executeUpdate();
-			    	
-			    	}*/
-                }
-
+                } */
             }
         } catch (SQLException sqlex) {
             sqlex.printStackTrace();
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-
     }
-
 }
-// ...existing code...
+

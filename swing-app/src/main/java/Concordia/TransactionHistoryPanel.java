@@ -3,13 +3,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /*------------------------------------------------------------------------------------------------------------------*/
-//TableWindow2 Class retrieves the data structure (from memory) and renders the History tables.
-//CompanyItemTablePanel also has 1 anonymous class containing  action listeners,called for when user selects an table item
-//from History tables respectively.
-// History tables is non editable - risk of data inconsistency too high
-//Selecting a row in the History table has the effect of updating the data entry controls (located in the AdminPanel Class).
-//
-// Most Companies purchase manufacturers items from the same suppliers usually this will ease the data entry procedure
+// TransactionHistoryPanel Class retrieves the data structure (from memory) and renders the Transaction History table.
+// TransactionHistoryPanel also has 1 anonymous class containing action listeners, called for when user selects a table item
+// from Transaction History table respectively.
+// Transaction History table is non editable - risk of data inconsistency too high
+// Selecting a row in the Transaction History table has the effect of updating the data entry controls (located in the AdminPanel Class).
 /*-------------------------------------------------------------------------------------------------------------------*/
 
 import javax.swing.*;
@@ -19,8 +17,8 @@ import javax.swing.table.TableRowSorter;
 
 import java.awt.Dimension;
 import concordia.domain.Company;
-import concordia.domain.Item;
-import concordia.domain.history;
+// import concordia.domain.Item; // Removed: Item no longer exists
+import concordia.domain.TransactionHistory;
 
 
 public class TransactionHistoryPanel extends JPanel {
@@ -30,9 +28,9 @@ public class TransactionHistoryPanel extends JPanel {
     private final JTextArea historyTransactionStatusText;
     private final TableRowSorter<MyTableModel> historyTransactionNameSorter;
     private final MyTableModel transactionHistoryTableModel;
-    private Consumer<history> historySelectionListener;
+    private Consumer<TransactionHistory> historySelectionListener;
 
-        public TransactionHistoryPanel(List<Item> items, List<Company> companies, List<history> history) {
+        public TransactionHistoryPanel(List<Company> companies, List<TransactionHistory> history) {
         super(new java.awt.BorderLayout());
         setOpaque(true);
         setBackground(new java.awt.Color(255, 240, 240));
@@ -42,7 +40,7 @@ public class TransactionHistoryPanel extends JPanel {
         // Use the full history list provided to this panel so all
         // records are displayed in the table (not just the first
         // company's first item's history).
-        java.util.List<history> historyList = (history != null)
+        java.util.List<TransactionHistory> historyList = (history != null)
             ? new java.util.ArrayList<>(history)
             : new java.util.ArrayList<>();
         transactionHistoryTableModel = new MyTableModel(historyList, 0);
@@ -77,7 +75,7 @@ public class TransactionHistoryPanel extends JPanel {
                             return;
                         }
                         int modelRow = transactionHistoryTable.convertRowIndexToModel(viewRow);
-                        history selected = transactionHistoryTableModel.getHistoryAtRow(modelRow);
+                        TransactionHistory selected = transactionHistoryTableModel.getHistoryAtRow(modelRow);
                         String notes = (selected != null) ? selected.getNotes() : null;
                         if (notes == null || notes.trim().isEmpty()) {
                             historyTransactionStatusText.setText("No notes found.");
@@ -174,11 +172,11 @@ public class TransactionHistoryPanel extends JPanel {
         historyTransactionNameSorter.setRowFilter(rf);
     }
 
-    public void updateHistory(List<history> newHistory) {
+    public void updateHistory(List<TransactionHistory> newHistory) {
         updateHistory(newHistory, true);
     }
 
-    public void updateHistory(List<history> newHistory, boolean autoSelectFirst) {
+    public void updateHistory(List<TransactionHistory> newHistory, boolean autoSelectFirst) {
         transactionHistoryTableModel.updateHistory(newHistory);
         historyTransactionStatusText.setText("History for");
         if (autoSelectFirst && transactionHistoryTable.getRowCount() > 0) {
@@ -197,7 +195,7 @@ public class TransactionHistoryPanel extends JPanel {
         }
     }
 
-    public void setHistorySelectionListener(Consumer<history> listener) {
+    public void setHistorySelectionListener(Consumer<TransactionHistory> listener) {
         this.historySelectionListener = listener;
     }
 
@@ -205,35 +203,36 @@ public class TransactionHistoryPanel extends JPanel {
         private static final long serialVersionUID = 1L;
         private String[] columnNames = {
             "Delivery Date",
-            "Service",
-            "Service Size",
+            "Service Type",
             "Location",
             "Amount",
-            "Provider" };
-        private List<history> history;
+            "Provider",
+            "Notes"
+        };
+        private List<TransactionHistory> history;
         private Object[][] data;
 
-        public MyTableModel(List<history> history, int index1) {
+        public MyTableModel(List<TransactionHistory> history, int index1) {
             updateHistory(history);
         }
 
-        public void updateHistory(List<history> history) {
+        public void updateHistory(List<TransactionHistory> history) {
             this.history = (history != null) ? new java.util.ArrayList<>(history) : java.util.Collections.emptyList();
             int listSize = this.history.size();
             data = new Object[listSize][6];
             for (int i = 0; i < listSize; i++) {
                 data[i][0] = this.history.get(i).getDeliveryDate();
- //               data[i][1] = this.history.get(i).getService();
-  //              data[i][2] = this.history.get(i).getServiceSize();
-                data[i][3] = this.history.get(i).getLocation();
-                data[i][4] = this.history.get(i).getAmount();
-                data[i][5] = this.history.get(i).getProvider();
+                data[i][1] = (this.history.get(i).getServiceType() != null) ? this.history.get(i).getServiceType().getTypeName() : "";
+                data[i][2] = this.history.get(i).getLocation();
+                data[i][3] = this.history.get(i).getAmount();
+                data[i][4] = this.history.get(i).getProvider();
+                data[i][5] = this.history.get(i).getNotes();
             }
             fireTableDataChanged();
         }
 
-        // Helper to get the History entity associated with a given table row.
-        public history getHistoryAtRow(int row) {
+        // Helper to get the TransactionHistory entity associated with a given table row.
+        public TransactionHistory getHistoryAtRow(int row) {
             if (row < 0 || row >= history.size()) {
                 return null;
             }
@@ -245,11 +244,11 @@ public class TransactionHistoryPanel extends JPanel {
             final Object[][] data2 = new Object[listSize][6];
             for (int i = 0; i < listSize; i++) {
                 data2[i][0] = (Object) history.get(i).getDeliveryDate();
-   //             data2[i][1] = (Object) history.get(i).getService();
-    //            data2[i][2] = (Object) history.get(i).getServiceSize();
-                data2[i][3] = (Object) history.get(i).getLocation();
-                data2[i][4] = (Object) history.get(i).getAmount();
-                data2[i][5] = (Object) history.get(i).getProvider();
+                data2[i][1] = (history.get(i).getServiceType() != null) ? history.get(i).getServiceType().getTypeName() : "";
+                data2[i][2] = (Object) history.get(i).getLocation();
+                data2[i][3] = (Object) history.get(i).getAmount();
+                data2[i][4] = (Object) history.get(i).getProvider();
+                data2[i][5] = (Object) history.get(i).getNotes();
             }
             return data2;
         }

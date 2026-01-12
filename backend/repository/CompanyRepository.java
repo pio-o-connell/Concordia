@@ -25,7 +25,8 @@ public class CompanyRepository {
         EntityTransaction tx = entityManager.getTransaction();
         try {
             tx.begin();
-            Company company = new Company(companyId, "", companyName, new java.util.HashSet<>(), new java.util.HashSet<>());
+            // Update to match the new Company constructor signature
+            Company company = new Company(companyId, companyName, new java.util.HashSet<>());
             entityManager.persist(company);
             tx.commit();
         } catch (RuntimeException ex) {
