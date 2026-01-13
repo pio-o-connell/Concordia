@@ -7,7 +7,6 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>concordia.domain.Company</class>
         <class>concordia.domain.User</class>
-        <class>concordia.domain.Item</class>
         <class>concordia.domain.history</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>

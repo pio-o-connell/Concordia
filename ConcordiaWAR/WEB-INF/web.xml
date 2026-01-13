@@ -7,7 +7,7 @@
     <!-- Explicit servlet mapping for ConcordiaServlet -->
     <servlet>
         <servlet-name>ConcordiaServlet</servlet-name>
-        <servlet-class>Concordia.controller.ConcordiaServlet</servlet-class>
+        <servlet-class>backend.controller.ConcordiaServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ConcordiaServlet</servlet-name>

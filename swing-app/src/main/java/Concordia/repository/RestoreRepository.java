@@ -48,9 +48,9 @@ public class RestoreRepository {
                 transactionHistories.add(history);
             }
             // Example: assign serviceTypes to companies as needed
-            for (Company company : companies) {
-                company.setServiceTypes(serviceTypes);
-            }
+            // for (Company company : companies) {
+            //     company.setServiceTypes(serviceTypes);
+            // }
         } catch (SQLException sqlex) {
             sqlex.printStackTrace();
         }

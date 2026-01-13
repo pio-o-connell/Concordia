@@ -23,7 +23,7 @@ public class GenerateFullDummyData {
 
         // Optional: Clear existing data
         stmt.executeUpdate("DELETE FROM history");
-        stmt.executeUpdate("DELETE FROM item");
+        stmt.executeUpdate("DELETE FROM services");
         stmt.executeUpdate("DELETE FROM company");
 
         // Insert companies
@@ -37,16 +37,16 @@ public class GenerateFullDummyData {
             ps.close();
         }
 
-        // Insert items for each company
-        String[] itemNames = {"Widget", "Gadget", "Thingamajig"};
-        int itemIdBase = 33008177;
-        int itemCount = 3;
+        // Insert services for each company
+        String[] serviceNames = {"Widget", "Gadget", "Thingamajig"};
+        int serviceIdBase = 33008177;
+        int serviceCount = 3;
         for (int i = 0; i < companyIds.length; i++) {
-            for (int j = 0; j < itemCount; j++) {
-                int itemId = itemIdBase + i * 10 + j;
-                PreparedStatement ps = con.prepareStatement("INSERT INTO item (item_id, item_name, company_id, quantity) VALUES (?, ?, ?, ?)");
-                ps.setInt(1, itemId);
-                ps.setString(2, itemNames[j]);
+            for (int j = 0; j < serviceCount; j++) {
+                int serviceId = serviceIdBase + i * 10 + j;
+                PreparedStatement ps = con.prepareStatement("INSERT INTO services (service_id, service_name, company_id, quantity) VALUES (?, ?, ?, ?)");
+                ps.setInt(1, serviceId);
+                ps.setString(2, serviceNames[j]);
                 ps.setInt(3, companyIds[i]);
                 ps.setInt(4, 10 + rand.nextInt(90));
                 ps.executeUpdate();
@@ -54,24 +54,24 @@ public class GenerateFullDummyData {
             }
         }
 
-        // Insert history for each item
+        // Insert history for each services
         String[] locations = {"Dublin", "Cork", "Limerick", "Galway", "Waterford"};
         String[] providers = {"Sony", "Samsung", "LG", "Panasonic", "Philips"};
         int historyIdBase = 10000000;
         for (int i = 0; i < companyIds.length; i++) {
-            for (int j = 0; j < itemCount; j++) {
-                int itemId = itemIdBase + i * 10 + j;
-                for (int h = 0; h < 5; h++) { // 5 history records per item
+            for (int j = 0; j < serviceCount; j++) {
+                int serviceId = serviceIdBase + i * 10 + j;
+                for (int h = 0; h < 5; h++) { // 5 history records per services
                     int historyId = historyIdBase + i * 100 + j * 10 + h;
                     int amount = 1 + rand.nextInt(100);
                     String location = locations[rand.nextInt(locations.length)];
                     String provider = providers[rand.nextInt(providers.length)];
                     String deliveryDate = sdf.format(new Date(System.currentTimeMillis() - rand.nextInt(1000 * 60 * 60 * 24 * 365)));
                     PreparedStatement ps = con.prepareStatement(
-                        "INSERT INTO history (history_id, item_id, amount, location, provider, delivery_date) VALUES (?, ?, ?, ?, ?, ?)"
+                        "INSERT INTO history (history_id, service_id, amount, location, provider, delivery_date) VALUES (?, ?, ?, ?, ?, ?)"
                     );
                     ps.setInt(1, historyId);
-                    ps.setInt(2, itemId);
+                    ps.setInt(2, serviceId);
                     ps.setInt(3, amount);
                     ps.setString(4, location);
                     ps.setString(5, provider);
@@ -82,6 +82,6 @@ public class GenerateFullDummyData {
             }
         }
         con.close();
-        System.out.println("Dummy company, item, and history data generated.");
+        System.out.println("Dummy company, services, and history data generated.");
     }
 }

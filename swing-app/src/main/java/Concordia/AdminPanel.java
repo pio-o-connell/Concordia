@@ -37,26 +37,25 @@ import javax.swing.BoxLayout;
 //import com.mysql.jdbc.Connection;
 
 /*------------------------------------------------------------------------------------------------------------------*/
-// AdminPanel Class facilitates the entry of item purchased transaction in the Concordia Class.
-// It's necessary to select a Supplier,then select an item from the item tables.
+// AdminPanel Class facilitates the entry of services purchased transaction in the Concordia Class.
+// It's necessary to select a Supplier, then select a row from the services tables.
 // Unfortunately, there are issues setting a default selection in the windows on startup - this would guarantee the
-// system is in a steady state.It is but just not displayed.
-//						The particular row selected in both the history and item tables 
-//would be reflected in the 'New Inventory to add' panel to facilitate easy entry by the user.Selecting an item from 
-//the History table has the effect of updating the edit controls.
-// 												Most Suppliers are normally'returning' customers i.e. historically 
-//a particular manufacturer's item purchased is normally from a previous supplier.
-// So,selecting a row in the History table has the effect of updating the data entry controls. 
+// system is in a steady state. It is but just not displayed.
+// The particular row selected in both the history and services tables
+// would be reflected in the 'New Inventory to add' panel to facilitate easy entry by the user. Selecting a row from
+// the History table has the effect of updating the edit controls.
+// Most Suppliers are normally 'returning' customers i.e. historically
+// a particular manufacturer's services purchased is normally from a previous supplier.
+// So, selecting a row in the History table has the effect of updating the data entry controls.
 //
-// 
-// There should be discounts for returning customers(loyalty schemes in operation) so the application could prove useful.
+// There should be discounts for returning customers (loyalty schemes in operation) so the application could prove useful.
 // An 'Add' button facilitates the entry of new transaction to the system.
-// 
-// An 'Update' button facilitates the updating of an existing record.This is still not implemented.The database elements
+//
+// An 'Update' button facilitates the updating of an existing record. This is still not implemented. The database elements
 // are non-editable. Clicking the update button should have the effect of displaying a custom modal dialog, where user is
 // restricted in allowable entries.
 //
-// There is no validity checks on 'New Transactions/Itms To Add'. This should have been implemented using custom controls i.e.
+// There is no validity checks on 'New Transactions/Services To Add'. This should have been implemented using custom controls i.e.
 // data spinner especially.
 //
 // It's not possible to manually edit the table fields, risk of data inconsistency very high.

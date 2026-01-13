@@ -7,6 +7,14 @@ import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 public class ServiceTypeRepository {
+        public java.util.List<ServiceType> getAllServiceTypesForCompany(int companyId) {
+            TypedQuery<ServiceType> query = entityManager.createQuery(
+                "SELECT st FROM ServiceType st WHERE st.company.companyId = :companyId",
+                ServiceType.class
+            );
+            query.setParameter("companyId", companyId);
+            return query.getResultList();
+        }
     private final EntityManager entityManager;
 
     public ServiceTypeRepository(EntityManager entityManager) {

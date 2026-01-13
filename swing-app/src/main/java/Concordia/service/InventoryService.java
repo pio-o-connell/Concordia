@@ -1,43 +1,81 @@
 
 package concordia.service;
-import concordia.annotations.Service;
 
+import concordia.annotations.Services;
 import concordia.repository.CompanyRepository;
 import concordia.repository.ServiceRepository;
 import concordia.repository.TransactionHistoryRepository;
+import concordia.repository.ServicesRepository;
+import concordia.repository.ServicePricingRepository;
 import concordia.domain.Company;
 import concordia.domain.ServiceType;
 import concordia.domain.ServicePricing;
 import concordia.domain.TransactionHistory;
 import java.util.List;
 
-@Service
+@Services
 public class InventoryService {
     private final CompanyRepository companyRepo;
     private final ServiceRepository serviceRepo;
     private final TransactionHistoryRepository historyRepo;
-    public InventoryService(CompanyRepository companyRepo, ServiceRepository serviceRepo, TransactionHistoryRepository historyRepo) {
+    private final ServicesRepository servicesRepo;
+    private final ServicePricingRepository servicePricingRepo;
+
+    public InventoryService(CompanyRepository companyRepo, ServiceRepository serviceRepo, TransactionHistoryRepository historyRepo, ServicesRepository servicesRepo, ServicePricingRepository servicePricingRepo) {
         this.companyRepo = companyRepo;
         this.serviceRepo = serviceRepo;
         this.historyRepo = historyRepo;
+        this.servicesRepo = servicesRepo;
+        this.servicePricingRepo = servicePricingRepo;
     }
 
-    // Retrieve all service types
+    // --- Services CRUD methods ---
+    public List<concordia.domain.Services> getAllServices() {
+        return servicesRepo.getAllServices();
+    }
+
+    public void addService(concordia.domain.Services service) {
+        servicesRepo.insertService(service);
+    }
+
+    public void updateService(concordia.domain.Services service) {
+        servicesRepo.updateService(service);
+    }
+
+    public void deleteService(int serviceId) {
+        servicesRepo.deleteService(serviceId);
+    }
+
+    // --- ServicePricing CRUD methods ---
+    public List<concordia.domain.ServicePricing> getAllServicePricingsDirect() {
+        return servicePricingRepo.getAllServicePricings();
+    }
+
+    public void addServicePricingDirect(concordia.domain.ServicePricing servicePricing) {
+        servicePricingRepo.insertServicePricing(servicePricing);
+    }
+
+    public void updateServicePricing(concordia.domain.ServicePricing servicePricing) {
+        servicePricingRepo.updateServicePricing(servicePricing);
+    }
+
+    public void deleteServicePricingDirect(int servicePricingId) {
+        servicePricingRepo.deleteServicePricing(servicePricingId);
+    }
+
+    // --- ServiceType and TransactionHistory methods ---
     public List<ServiceType> getAllServiceTypes() {
         return serviceRepo.getAllServiceTypes();
     }
 
-    // Retrieve all service pricing
     public List<ServicePricing> getAllServicePricings() {
         return serviceRepo.getAllServicePricings();
     }
 
-    // Retrieve all transaction history records
     public List<TransactionHistory> getAllTransactionHistory() {
         return historyRepo.getAllTransactionHistory();
     }
 
-    // Example thin delegation methods
     public List<Company> getAllCompanies() {
         return companyRepo.loadCompaniesWithUsers();
     }

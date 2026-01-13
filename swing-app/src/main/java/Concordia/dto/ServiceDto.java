@@ -5,12 +5,12 @@
 package concordia.dto;
 
 import java.util.List;
-import concordia.dto.HistoryDto;
+import concordia.dto.TransactionHistoryDto;
 
 public class ServiceDto {
     public int serviceId;
     public int companyId;
     public String serviceName;
     public String notes;
-    public List<HistoryDto> transactionHistory;
+    public List<TransactionHistoryDto> transactionHistory;
 }

@@ -24,16 +24,16 @@ public class GenerateDummyHistoryData {
         String[] providers = {"Sony", "Samsung", "LG", "Panasonic", "Philips"};
 
         for (int i = 0; i < numRecords; i++) {
-            int itemId = 44008177 + rand.nextInt(3); // Example item IDs
+            int serviceId = 44008177 + rand.nextInt(3); // Example services IDs
             int amount = 1 + rand.nextInt(100);
             String location = locations[rand.nextInt(locations.length)];
             String provider = providers[rand.nextInt(providers.length)];
             String deliveryDate = sdf.format(new Date(System.currentTimeMillis() - rand.nextInt(1000 * 60 * 60 * 24 * 365)));
 
             PreparedStatement stmt = con.prepareStatement(
-                "INSERT INTO history (ITEM_id, AMOUNT, LOCATION, PROVIDER, DELIVERY_DATE) VALUES (?, ?, ?, ?, ?)"
+                "INSERT INTO history (service_id, AMOUNT, LOCATION, PROVIDER, DELIVERY_DATE) VALUES (?, ?, ?, ?, ?)"
             );
-            stmt.setInt(1, itemId);
+            stmt.setInt(1, serviceId);
             stmt.setInt(2, amount);
             stmt.setString(3, location);
             stmt.setString(4, provider);

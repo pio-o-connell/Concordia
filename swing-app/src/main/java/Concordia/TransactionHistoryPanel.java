@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 
 /*------------------------------------------------------------------------------------------------------------------*/
 // TransactionHistoryPanel Class retrieves the data structure (from memory) and renders the Transaction History table.
-// TransactionHistoryPanel also has 1 anonymous class containing action listeners, called for when user selects a table item
+// TransactionHistoryPanel also has 1 anonymous class containing action listeners, called for when user selects a row
 // from Transaction History table respectively.
 // Transaction History table is non editable - risk of data inconsistency too high
 // Selecting a row in the Transaction History table has the effect of updating the data entry controls (located in the AdminPanel Class).
@@ -39,7 +39,7 @@ public class TransactionHistoryPanel extends JPanel {
 
         // Use the full history list provided to this panel so all
         // records are displayed in the table (not just the first
-        // company's first item's history).
+        // company's first services's history).
         java.util.List<TransactionHistory> historyList = (history != null)
             ? new java.util.ArrayList<>(history)
             : new java.util.ArrayList<>();

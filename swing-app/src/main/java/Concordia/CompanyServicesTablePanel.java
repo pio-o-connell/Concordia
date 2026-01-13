@@ -1,7 +1,7 @@
 package concordia;
 
 // CompanyServicesTablePanel Class retrieves the data structure and renders both the Companies and Service Types tables.
-// CompanyServicesTablePanel also has 2 anonymous classes containing action listeners, called for when user selects a table item
+// CompanyServicesTablePanel also has 2 anonymous classes containing action listeners, called for when user selects a row
 // from Company or ServiceType tables respectively.
 // Selecting a row in the Company table has the effect of updating the Service Types Window.
 // Both the Companies and Service Types tables are non editable - risk of data inconsistency too high
@@ -56,8 +56,8 @@ public class CompanyServicesTablePanel extends JPanel {
                 return false;
             }
         };
-        java.awt.Font itemTableFont = new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 13);
-        companyTable.setFont(itemTableFont);
+        java.awt.Font servicesTableFont = new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 13);
+        companyTable.setFont(servicesTableFont);
         companyTable.setRowHeight(24);
         companyTable.setSelectionBackground(new java.awt.Color(220, 220, 255));
         companyTable.setSelectionForeground(java.awt.Color.BLACK);
@@ -76,7 +76,7 @@ public class CompanyServicesTablePanel extends JPanel {
         );
         // ...existing code for serviceTypeTable and other UI setup...
     }
-    // --- Model classes migrated from CompanyItemTablePanel.java ---
+    // --- Model classes migrated from CompanyServicesTablePanel.java ---
     // Uses CompanyDto and ServiceTypeDto from swing-app's dto package
     public static class CompanyModel extends AbstractTableModel {
         private final String[] columnNames = {"ID", "Name", "Title"};

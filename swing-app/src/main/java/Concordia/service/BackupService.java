@@ -1,13 +1,13 @@
 
 package concordia.service;
-import concordia.annotations.Service;
+import concordia.annotations.Services;
 
 import concordia.repository.BackupRepository;
 import concordia.domain.Company;
 import java.sql.SQLException;
 import java.util.List;
 
-@Service
+@Services
 public class BackupService {
     private final BackupRepository repo;
     public BackupService(BackupRepository repo) {

@@ -4,24 +4,36 @@ import backend.repository.CompanyRepository;
 import backend.repository.ServiceTypeRepository;
 import backend.repository.ServicePricingRepository;
 import backend.repository.TransactionHistoryRepository;
+import backend.repository.ServiceRepository;
 import concordia.domain.Company;
+import concordia.domain.Services;
 import concordia.domain.ServiceType;
 import concordia.domain.ServicePricing;
 import concordia.domain.TransactionHistory;
 import java.util.List;
 
 public class InventoryService {
-    private final CompanyRepository companyRepository;
-    private final ServiceTypeRepository serviceTypeRepository;
-    private final ServicePricingRepository servicePricingRepository;
-    private final TransactionHistoryRepository transactionHistoryRepository;
+    private final ServiceRepository serviceRepository;
 
-    public InventoryService(CompanyRepository companyRepository, ServiceTypeRepository serviceTypeRepository, ServicePricingRepository servicePricingRepository, TransactionHistoryRepository transactionHistoryRepository) {
+    public InventoryService(CompanyRepository companyRepository, ServiceTypeRepository serviceTypeRepository, ServicePricingRepository servicePricingRepository, TransactionHistoryRepository transactionHistoryRepository, ServiceRepository serviceRepository) {
         this.companyRepository = companyRepository;
         this.serviceTypeRepository = serviceTypeRepository;
         this.servicePricingRepository = servicePricingRepository;
         this.transactionHistoryRepository = transactionHistoryRepository;
+        this.serviceRepository = serviceRepository;
     }
+
+    public List<Services> getAllServices() {
+        return serviceRepository.getAllServices();
+    }
+
+    public void addService(Services service) {
+        serviceRepository.insertService(service);
+    }
+    private final CompanyRepository companyRepository;
+    private final ServiceTypeRepository serviceTypeRepository;
+    private final ServicePricingRepository servicePricingRepository;
+    private final TransactionHistoryRepository transactionHistoryRepository;
 
     public List<ServiceType> getAllServiceTypes() {
         return serviceTypeRepository.getAllServiceTypes();

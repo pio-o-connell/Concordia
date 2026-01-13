@@ -1,3 +1,4 @@
+// ...existing code...
 package backend.repository;
 
 import concordia.domain.Company;
@@ -7,6 +8,9 @@ import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 public class CompanyRepository {
+        public Company findById(int companyId) {
+            return entityManager.find(Company.class, companyId);
+        }
     private final EntityManager entityManager;
 
     public CompanyRepository(EntityManager entityManager) {
@@ -15,7 +19,7 @@ public class CompanyRepository {
 
     public List<Company> getAllCompanies() {
         TypedQuery<Company> query = entityManager.createQuery(
-            "SELECT DISTINCT c FROM Company c LEFT JOIN FETCH c.items LEFT JOIN FETCH c.users",
+            "SELECT DISTINCT c FROM Company c LEFT JOIN FETCH c.services LEFT JOIN FETCH c.users",
             Company.class
         );
         return query.getResultList();

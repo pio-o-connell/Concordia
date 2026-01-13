@@ -3,6 +3,7 @@ package backend.infrastructure;
 import backend.repository.CompanyRepository;
 import backend.repository.ServiceTypeRepository;
 import backend.repository.ServicePricingRepository;
+import backend.repository.ServiceRepository;
 import backend.repository.TransactionHistoryRepository;
 import backend.repository.UserRepository;
 import backend.service.InventoryService;
@@ -20,6 +21,7 @@ public final class JpaContext implements AutoCloseable {
     private final CompanyRepository companyRepository;
     private final ServiceTypeRepository serviceTypeRepository;
     private final ServicePricingRepository servicePricingRepository;
+    private final ServiceRepository serviceRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
     private final UserRepository userRepository;
     private final InventoryService inventoryService;
@@ -29,9 +31,14 @@ public final class JpaContext implements AutoCloseable {
         this.companyRepository = new CompanyRepository(entityManager);
         this.serviceTypeRepository = new ServiceTypeRepository(entityManager);
         this.servicePricingRepository = new ServicePricingRepository(entityManager);
+        this.serviceRepository = new ServiceRepository(entityManager);
         this.transactionHistoryRepository = new TransactionHistoryRepository(entityManager);
         this.userRepository = new UserRepository(entityManager);
-        this.inventoryService = new InventoryService(companyRepository, serviceTypeRepository, servicePricingRepository, transactionHistoryRepository);
+        this.inventoryService = new InventoryService(companyRepository, serviceTypeRepository, servicePricingRepository, transactionHistoryRepository, serviceRepository);
+    }
+
+    public ServiceRepository serviceRepository() {
+        return serviceRepository;
     }
 
     public static JpaContext open(EntityManagerFactory entityManagerFactory) {

@@ -5,6 +5,8 @@ import backend.dto.TransactionHistoryDto;
 import backend.dto.ServiceTypeDto;
 import backend.dto.ServicePricingDto;
 import backend.dto.UserDto;
+import backend.dto.ServiceDto;
+import concordia.domain.Services;
 import backend.infrastructure.JpaContext;
 import backend.infrastructure.PersistenceFactory;
 import backend.repository.UserRepository;
@@ -47,7 +49,17 @@ public class ConcordiaServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String type = normalizeType(req.getParameter("type"));
+        String rawType = req.getParameter("type");
+        String type = normalizeType(rawType);
+        // Accept plural forms for compatibility
+        if (type != null) {
+            switch (type) {
+                case "services": type = "service"; break;
+                case "serviceTypes": type = "serviceType"; break;
+                case "servicePricings": type = "servicePricing"; break;
+            }
+        }
+        System.out.println("[DEBUG] doGet: rawType='" + rawType + "', normalizedType='" + type + "'");
         if (type == null) {
             respondBadRequest(resp, "Missing type parameter");
             return;
@@ -57,6 +69,9 @@ public class ConcordiaServlet extends HttpServlet {
             InventoryService inventory = context.inventoryService();
             UserRepository users = context.userRepository();
             switch (type) {
+                case "service":
+                    writeJson(resp, mapServices(inventory.getAllServices()));
+                    break;
                 case "serviceType":
                     writeJson(resp, mapServiceTypes(inventory.getAllServiceTypes()));
                     break;
@@ -83,6 +98,14 @@ public class ConcordiaServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String type = normalizeType(req.getParameter("type"));
+        // Accept plural forms for compatibility
+        if (type != null) {
+            switch (type) {
+                case "services": type = "service"; break;
+                case "serviceTypes": type = "serviceType"; break;
+                case "servicePricings": type = "servicePricing"; break;
+            }
+        }
         if (type == null) {
             respondBadRequest(resp, "Missing type parameter");
             return;
@@ -91,6 +114,19 @@ public class ConcordiaServlet extends HttpServlet {
             InventoryService inventory = context.inventoryService();
             UserRepository users = context.userRepository();
             switch (type) {
+                case "service": {
+                    ServiceDto dto = mapper.readValue(req.getInputStream(), ServiceDto.class);
+                    Services service = new Services();
+                    service.setServiceId(dto.serviceId);
+                    Company company = context.companyRepository().findById(dto.companyId);
+                    service.setCompany(company);
+                    service.setServiceName(dto.serviceName);
+                    service.setNotes(dto.notes);
+                    inventory.addService(service);
+                    resp.setStatus(HttpServletResponse.SC_CREATED);
+                    resp.getWriter().write("Service created");
+                    break;
+                }
                 case "serviceType": {
                     ServiceTypeDto dto = mapper.readValue(req.getInputStream(), ServiceTypeDto.class);
                     ServiceType serviceType = new ServiceType();
@@ -106,6 +142,7 @@ public class ConcordiaServlet extends HttpServlet {
                     servicePricing.setServiceTypeId(dto.serviceTypeId);
                     servicePricing.setPrice(dto.price);
                     servicePricing.setCurrency(dto.currency);
+                    servicePricing.setEffectiveDate(dto.effectiveDate);
                     inventory.addServicePricing(servicePricing);
                     resp.setStatus(HttpServletResponse.SC_CREATED);
                     resp.getWriter().write("ServicePricing created");
@@ -273,11 +310,16 @@ public class ConcordiaServlet extends HttpServlet {
         for (TransactionHistory record : histories) {
             TransactionHistoryDto dto = new TransactionHistoryDto();
             dto.transactionId = record.getTransactionId();
+            dto.serviceId = record.getServiceId();
             dto.serviceTypeId = record.getServiceTypeId();
-            dto.amount = record.getAmount();
+            dto.serviceSnapshotSize = record.getServiceSnapshotSize();
+            dto.quantity = record.getQuantity();
             dto.location = record.getLocation();
             dto.provider = record.getProvider();
             dto.deliveryDate = record.getDeliveryDate();
+            dto.unitCostSnapshot = record.getUnitCostSnapshot();
+            dto.amount = record.getAmount();
+            dto.serviceName = record.getServiceName();
             dto.notes = record.getNotes();
             result.add(dto);
         }
@@ -299,6 +341,22 @@ public class ConcordiaServlet extends HttpServlet {
         return result;
     }
 
+    private List<ServiceDto> mapServices(Collection<Services> services) {
+        List<ServiceDto> result = new ArrayList<>();
+        if (services == null) {
+            return result;
+        }
+        for (Services service : services) {
+            ServiceDto dto = new ServiceDto();
+            dto.serviceId = service.getServiceId();
+            dto.companyId = service.getCompany() != null ? service.getCompany().getCompanyId() : 0;
+            dto.serviceName = service.getServiceName();
+            dto.notes = service.getNotes();
+            result.add(dto);
+        }
+        return result;
+    }
+
     private void writeJson(HttpServletResponse resp, Object payload) throws IOException {
         resp.getWriter().write(mapper.writeValueAsString(payload));
     }
@@ -314,6 +372,19 @@ public class ConcordiaServlet extends HttpServlet {
     }
 
     private String normalizeType(String type) {
-        return type == null ? null : type.trim().toLowerCase();
+        if (type == null) return null;
+        String t = type.trim();
+        switch (t.toLowerCase()) {
+            case "service": return "service";
+            case "services": return "services";
+            case "servicetype": return "serviceType";
+            case "servicetypes": return "serviceTypes";
+            case "servicepricing": return "servicePricing";
+            case "servicepricings": return "servicePricings";
+            case "transactionhistory": return "transactionHistory";
+            case "company": return "company";
+            case "user": return "user";
+            default: return t;
+        }
     }
-}
+    }

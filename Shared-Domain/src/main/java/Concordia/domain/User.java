@@ -9,6 +9,7 @@ import java.io.Serializable;
  ---------------------------------------------------------------------------------------*/
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -35,6 +36,7 @@ public class User implements Serializable{
 
 	@ManyToOne
 	@JoinColumn(name = "company_id", nullable = false)
+	@JsonIgnore
 	private Company company;
 
 

@@ -13,10 +13,10 @@ public class ServicePricing implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "service_pricing_id")
-    private int servicePricingId;
+    private Integer servicePricingId;
 
     @Column(name = "service_type_id")
-    private int serviceTypeId;
+    private Integer serviceTypeId;
 
 
     @Column(name = "price")
@@ -39,13 +39,13 @@ public class ServicePricing implements Serializable {
         this.effectiveDate = effectiveDate;
     }
 
-    public int getServicePricingId() { return servicePricingId; }
+    public int getServicePricingId() { return servicePricingId != null ? servicePricingId : 0; }
     public void setServicePricingId(int servicePricingId) { this.servicePricingId = servicePricingId; }
 
-    public int getServiceTypeId() { return serviceTypeId; }
+    public int getServiceTypeId() { return serviceTypeId != null ? serviceTypeId : 0; }
     public void setServiceTypeId(int serviceTypeId) { this.serviceTypeId = serviceTypeId; }
 
-    public Double getPrice() { return price; }
+    public double getPrice() { return price != null ? price : 0.0; }
     public void setPrice(Double price) { this.price = price; }
 
     public String getCurrency() { return currency; }

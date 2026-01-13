@@ -6,6 +6,12 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "service_type")
 public class ServiceType implements Serializable {
+        @ManyToOne
+        @JoinColumn(name = "company_id")
+        private Company company;
+
+        public Company getCompany() { return company; }
+        public void setCompany(Company company) { this.company = company; }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "service_type_id")

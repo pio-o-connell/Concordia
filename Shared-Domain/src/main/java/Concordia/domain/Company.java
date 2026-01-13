@@ -4,21 +4,20 @@ package concordia.domain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import concordia.domain.Services;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "company")
 public class Company implements Serializable {
             // Constructor for DatabaseRestore compatibility
-            public Company(int companyId, String companyTitle, String companyName, java.util.Set<concordia.domain.ServiceType> serviceTypes, java.util.Set<User> users) {
-                this.companyId = companyId;
-                this.companyTitle = companyTitle;
-                this.companyName = companyName;
-                this.serviceTypes = serviceTypes != null ? serviceTypes : new java.util.HashSet<>();
-                this.users = users != null ? users : new java.util.HashSet<>();
-            }
-        @Transient
-        private java.util.Set<concordia.domain.ServiceType> serviceTypes = new java.util.HashSet<>();
+        public Company(int companyId, String companyTitle, String companyName, java.util.Set<Services> services, java.util.Set<User> users) {
+            this.companyId = companyId;
+            this.companyTitle = companyTitle;
+            this.companyName = companyName;
+            this.services = services != null ? services : new java.util.HashSet<>();
+            this.users = users != null ? users : new java.util.HashSet<>();
+        }
     @Id
     @Column(name = "company_id")
     private int companyId;
@@ -33,6 +32,13 @@ public class Company implements Serializable {
 
     @OneToMany(mappedBy = "company")
     private java.util.Set<User> users = new java.util.HashSet<>();
+
+
+    @OneToMany(mappedBy = "company")
+    private java.util.Set<Services> services = new java.util.HashSet<>();
+
+    public java.util.Set<Services> getServices() { return services; }
+    public void setServices(java.util.Set<Services> services) { this.services = services; }
 
 
     // No-arg constructor for JPA and tests
@@ -79,9 +85,7 @@ public class Company implements Serializable {
     public java.util.Set<User> getUsers() { return users; }
     public void setUsers(java.util.Set<User> users) { this.users = users; }
 
-    // --- Added for swing-app compatibility ---
-    public void setServiceTypes(java.util.Set<concordia.domain.ServiceType> serviceTypes) { this.serviceTypes = serviceTypes; }
-    public java.util.Set<concordia.domain.ServiceType> getServiceTypes() { return this.serviceTypes; }
+    // Removed obsolete ServiceType references
 
     }
 

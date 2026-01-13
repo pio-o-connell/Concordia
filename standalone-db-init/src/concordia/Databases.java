@@ -10,8 +10,8 @@ public final class Databases {
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
         PreparedStatement delHist = con.prepareStatement("DELETE FROM history");
         delHist.executeUpdate();
-        PreparedStatement delItem = con.prepareStatement("DELETE FROM item");
-        delItem.executeUpdate();
+        PreparedStatement delService = con.prepareStatement("DELETE FROM service");
+        delService.executeUpdate();
         PreparedStatement delComp = con.prepareStatement("DELETE FROM company");
         delComp.executeUpdate();
         String[] companyNames = {"Kanturk-Services", "GreenThumb Supplies"};
@@ -23,18 +23,18 @@ public final class Databases {
             ps.executeUpdate();
             ps.close();
         }
-        String[] kanturkItems = {"Shovel", "Rake", "Lawn Mower", "Hose"};
+        String[] kanturkServices = {"Shovel", "Rake", "Lawn Mower", "Hose"};
         int kanturkCompanyId = 44008177;
-        int kanturkItemIdBase = 44020000;
-        for (int j = 0; j < kanturkItems.length; j++) {
-            int itemId = kanturkItemIdBase + j;
-            String itemNote = "Kanturk item: " + kanturkItems[j] + " - essential for every garden.";
-            PreparedStatement ps = con.prepareStatement("INSERT INTO item (item_id, item_name, company_id, quantity, notes) VALUES (?, ?, ?, ?, ?)");
-            ps.setInt(1, itemId);
-            ps.setString(2, kanturkItems[j]);
+        int kanturkServiceIdBase = 44020000;
+        for (int j = 0; j < kanturkServices.length; j++) {
+            int serviceId = kanturkServiceIdBase + j;
+            String serviceNote = "Kanturk service: " + kanturkServices[j] + " - essential for every garden.";
+            PreparedStatement ps = con.prepareStatement("INSERT INTO service (service_id, service_name, company_id, quantity, notes) VALUES (?, ?, ?, ?, ?)");
+            ps.setInt(1, serviceId);
+            ps.setString(2, kanturkServices[j]);
             ps.setInt(3, kanturkCompanyId);
             ps.setInt(4, 10 + rand.nextInt(90));
-            ps.setString(5, itemNote);
+            ps.setString(5, serviceNote);
             ps.executeUpdate();
             ps.close();
             String[] locations = {"Greenhouse", "Garden Shed", "Nursery", "Compost Area"};
@@ -50,12 +50,12 @@ public final class Databases {
                 String location = locations[rand.nextInt(locations.length)];
                 String provider = providers[rand.nextInt(providers.length)];
                 String deliveryDate = sdf.format(new java.util.Date(System.currentTimeMillis() - rand.nextInt(1000 * 60 * 60 * 24 * 365)));
-                String note = notes[h % notes.length] + " (" + kanturkItems[j] + ")";
+                String note = notes[h % notes.length] + " (" + kanturkServices[j] + ")";
                 PreparedStatement psHist = con.prepareStatement(
-                    "INSERT INTO history (history_id, item_id, amount, location, provider, delivery_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?)"
+                    "INSERT INTO history (history_id, service_id, amount, location, provider, delivery_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?)"
                 );
                 psHist.setInt(1, historyId);
-                psHist.setInt(2, itemId);
+                psHist.setInt(2, serviceId);
                 psHist.setInt(3, amount);
                 psHist.setString(4, location);
                 psHist.setString(5, provider);
@@ -65,18 +65,18 @@ public final class Databases {
                 psHist.close();
             }
         }
-        String[] gardeningItems = {"Compost Bin", "Garden Hoe", "Tomato Seeds", "Watering Can"};
+        String[] gardeningServices = {"Compost Bin", "Garden Hoe", "Tomato Seeds", "Watering Can"};
         int gardeningCompanyId = 77008177;
-        int itemIdBase = 44010000;
-        for (int j = 0; j < gardeningItems.length; j++) {
-            int itemId = itemIdBase + j;
-            String itemNote = "Gardening item: " + gardeningItems[j] + " - essential for every garden.";
-            PreparedStatement ps = con.prepareStatement("INSERT INTO item (item_id, item_name, company_id, quantity, notes) VALUES (?, ?, ?, ?, ?)");
-            ps.setInt(1, itemId);
-            ps.setString(2, gardeningItems[j]);
+        int serviceIdBase = 44010000;
+        for (int j = 0; j < gardeningServices.length; j++) {
+            int serviceId = serviceIdBase + j;
+            String serviceNote = "Gardening service: " + gardeningServices[j] + " - essential for every garden.";
+            PreparedStatement ps = con.prepareStatement("INSERT INTO service (service_id, service_name, company_id, quantity, notes) VALUES (?, ?, ?, ?, ?)");
+            ps.setInt(1, serviceId);
+            ps.setString(2, gardeningServices[j]);
             ps.setInt(3, gardeningCompanyId);
             ps.setInt(4, 10 + rand.nextInt(90));
-            ps.setString(5, itemNote);
+            ps.setString(5, serviceNote);
             ps.executeUpdate();
             ps.close();
             String[] locations = {"Greenhouse", "Garden Shed", "Nursery", "Compost Area"};
@@ -92,12 +92,12 @@ public final class Databases {
                 String location = locations[rand.nextInt(locations.length)];
                 String provider = providers[rand.nextInt(providers.length)];
                 String deliveryDate = sdf.format(new java.util.Date(System.currentTimeMillis() - rand.nextInt(1000 * 60 * 60 * 24 * 365)));
-                String note = notes[h % notes.length] + " (" + gardeningItems[j] + ")";
+                String note = notes[h % notes.length] + " (" + gardeningServices[j] + ")";
                 PreparedStatement psHist = con.prepareStatement(
-                    "INSERT INTO history (history_id, item_id, amount, location, provider, delivery_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?)"
+                    "INSERT INTO history (history_id, service_id, amount, location, provider, delivery_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?)"
                 );
                 psHist.setInt(1, historyId);
-                psHist.setInt(2, itemId);
+                psHist.setInt(2, serviceId);
                 psHist.setInt(3, amount);
                 psHist.setString(4, location);
                 psHist.setString(5, provider);
@@ -120,7 +120,7 @@ public final class Databases {
         try {
             String[] dropTables = {
                 "DROP TABLE IF EXISTS history",
-                "DROP TABLE IF EXISTS item",
+                "DROP TABLE IF EXISTS service",
                 "DROP TABLE IF EXISTS users",
                 "DROP TABLE IF EXISTS company"
             };
@@ -135,9 +135,9 @@ public final class Databases {
             }
             String createCompany = "CREATE TABLE company (Company_ID SERIAL PRIMARY KEY, Company_title VARCHAR(25), company_name VARCHAR(255));";
             String createUsers = "CREATE TABLE users (User_ID SERIAL PRIMARY KEY, User_Name VARCHAR(25), User_Password VARCHAR(25) NOT NULL, Company_ID INT NOT NULL);";
-            String createItem = "CREATE TABLE item (Item_ID SERIAL PRIMARY KEY, Company_ID INT NOT NULL, quantity INT, item_name VARCHAR(25), Location VARCHAR(25), Notes VARCHAR(200));";
-            String createHistory = "CREATE TABLE history (history_id SERIAL PRIMARY KEY, item_ID INT NOT NULL, amount INT, location VARCHAR(25), provider VARCHAR(25), delivery_date VARCHAR(25), notes VARCHAR(200));";
-            String[] createTables = {createCompany, createUsers, createItem, createHistory};
+            String createService = "CREATE TABLE service (Service_ID SERIAL PRIMARY KEY, Company_ID INT NOT NULL, quantity INT, service_name VARCHAR(25), Location VARCHAR(25), Notes VARCHAR(200));";
+            String createHistory = "CREATE TABLE history (history_id SERIAL PRIMARY KEY, service_ID INT NOT NULL, amount INT, location VARCHAR(25), provider VARCHAR(25), delivery_date VARCHAR(25), notes VARCHAR(200));";
+            String[] createTables = {createCompany, createUsers, createService, createHistory};
             for (String sql : createTables) {
                 try {
                     PreparedStatement stmt = con.prepareStatement(sql);
