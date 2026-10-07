@@ -18,23 +18,27 @@ The project also demonstrates how an existing application can be progressively r
 
 ---
 
-# Running Application
+## Running Application
 
-## Swing Application
+### Swing Application
 
 The Swing client can be run as a local desktop application while communicating with the backend through the HTTP/JSON interface.
 
 
-<img src="swing-running.jpg" alt="Data Warehouse application" width="80%">
+<img src="swing-running.jpg" alt="Concordia application" width="80%">
 
-## Servlet Backend
+### Servlet Backend
 
 The Servlet application runs through Jetty and exposes the HTTP/API boundary.
 
 
-<img src="servlet-running.jpg" alt="Data Warehouse servlet" width="80%">
----
+<img src="servlet-running.jpg" alt="Concordia Servlet running in Jetty" width="80%">
+
+
+
+
 ## Architecture
+
 
 ```text
                          Concordia
